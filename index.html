@@ -134,7 +134,7 @@ section,footer,.marquee-belt,.stats-strip,.photo-strip,.full-section{position:re
 .chip{font-size:12px;color:var(--grey2);border:1px solid var(--border);padding:7px 16px;border-radius:100px;transition:all .3s}
 .chip:hover{border-color:var(--blue2);color:var(--white);background:var(--tint)}
 
-.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg3)}
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg3)}
 .stat-cell{padding:48px 0;text-align:center;border-right:1px solid var(--border)}
 .stat-cell:last-child{border-right:none}
 .stat-n{font-family:var(--font-hero);font-size:60px;color:var(--blue2);line-height:1}
@@ -285,17 +285,170 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:40px 5vw
 .foot-nav a:hover{color:var(--white)}
 .foot-copy{font-size:12px;color:var(--muted);text-align:right;line-height:1.7}
 
-@media(max-width:900px){
-  .about-cols,.edu-wrap,.store-layout,.contact-grid,.works-grid,
-  .process-top-grid,.steps-grid,.philo-grid,.stats-strip,.testi-grid,
-  .extra-grid,.extra-bottom{grid-template-columns:1fr}
+/* ═══════════════════════════
+   MOBILE  ≤ 768px
+═══════════════════════════ */
+@media(max-width:768px){
+  /* hide custom cursor on touch */
+  #cur,#cur-ring{display:none}
+  body{cursor:auto}
+
+  /* controls — smaller & lower opacity */
+  #controls{bottom:12px;right:12px}
+  .ctrl-pill{font-size:9px;padding:6px 11px}
+
+  /* nav */
+  nav#nav{height:56px;padding:0 20px}
+  .nav-links,.nav-cta{display:none}
+
+  /* hero */
+  #hero{padding:90px 20px 100px;min-height:100svh}
+  .hero-label{font-size:9px;letter-spacing:.2em;margin-bottom:20px}
+  .hero-h1{font-size:clamp(68px,18vw,110px)}
+  .hero-h1 .ital{font-size:clamp(54px,14vw,88px)}
+  .hero-sub{font-size:15px;margin-top:20px;max-width:100%}
+  .hero-badges{gap:8px;margin-top:20px}
+  .hero-badge{font-size:11px;padding:5px 12px}
+  .hero-cta-row{flex-direction:column;gap:12px;margin-top:28px}
+  .btn-blue,.btn-ghost{width:100%;justify-content:center;padding:16px 24px;font-size:15px}
+  .hero-meta{position:static;text-align:left;margin-top:32px;opacity:1;animation:none}
+  .hero-meta-item{font-size:9px;margin-bottom:6px}
+  .scroll-cue{left:20px;bottom:28px}
+
+  /* marquee */
+  .m-item{font-size:12px}
+
+  /* sections padding */
+  #about,#skills,#works,#extra,#education,#process,#hestore,#philosophy,#testimonials,#contact{
+    padding:64px 20px
+  }
+
+  /* about */
+  .about-intro-text{font-size:clamp(22px,6vw,32px);margin-bottom:36px}
+  .about-cols{grid-template-columns:1fr;gap:40px}
+  .about-body-text{font-size:15px}
+  .about-quote p{font-size:18px}
+  .detail-table td{font-size:13px}
+  .detail-table td:first-child{width:100px;font-size:9px}
+
+  /* stats — single col on mobile */
+  .stats-strip{grid-template-columns:1fr}
+  .stat-cell{padding:28px 20px;border-right:none;border-bottom:1px solid var(--border)}
+  .stat-cell:last-child{border-bottom:none}
+  .stat-n{font-size:44px}
+  .stat-l{font-size:9px;letter-spacing:.12em}
+
+  /* photo strip — 2 cols */
+  .photo-strip{grid-template-columns:1fr 1fr}
+  .ps-item{aspect-ratio:1/1}
+
+  /* skills */
+  .skills-hero{gap:20px}
+  .big-h{font-size:clamp(48px,12vw,72px)}
+  .skills-sub-text{text-align:left;max-width:100%}
+  .skills-rows{margin-top:0}
+  .sk-row{grid-template-columns:40px 1fr;gap:14px;padding:20px 12px}
+  .sk-desc,.sk-pill{display:none}
+  .sk-name{font-size:clamp(18px,5vw,26px)}
+
+  /* works */
+  .works-top{gap:20px}
+  .works-note-txt{text-align:left;max-width:100%}
+  .works-grid{grid-template-columns:1fr;gap:2px}
+  .w-item{aspect-ratio:16/9}
   .w-item.big{aspect-ratio:16/9}
+  .w-title{font-size:clamp(18px,5vw,28px)}
+  .w-body{padding:20px}
+  .w-desc{display:none}
+
+  /* extra */
+  .extra-grid{grid-template-columns:1fr}
+  .ex-c.wide{aspect-ratio:16/9}
+  .extra-bottom{grid-template-columns:1fr}
+  .ex-c{aspect-ratio:16/9}
+  .ex-title{font-size:18px}
+
+  /* education */
+  .edu-wrap{grid-template-columns:1fr;gap:40px}
+  .edu-img-stack{height:220px}
+  .ei1{width:60%;height:70%}
+  .ei2{width:55%;height:60%}
+  .ei3{width:38%;height:34%}
+  .edu-school{font-size:clamp(16px,5vw,22px)}
+  .edu-intro-p{font-size:14px}
+
+  /* process */
+  .process-top-grid{grid-template-columns:1fr;gap:32px;margin-bottom:40px}
+  .steps-grid{grid-template-columns:1fr 1fr;gap:2px}
+  .step-c{padding:28px 18px}
+  .step-n{font-size:36px}
+  .step-title{font-size:15px}
+  .step-text{font-size:12px}
+
+  /* hestore */
+  .store-big-img{aspect-ratio:16/9;margin-bottom:40px}
+  .store-layout{grid-template-columns:1fr;gap:40px}
+  .store-h{font-size:clamp(30px,8vw,48px)}
+  .store-p{font-size:14px}
+  .store-cta-block{padding:32px 20px;flex-direction:column;align-items:flex-start}
+  .store-cta-block h4{font-size:clamp(22px,6vw,32px)}
+  .store-cta-block .btn-blue{width:100%;justify-content:center}
+  .svc-c{padding:24px 16px}
+
+  /* philosophy */
+  .philo-q{font-size:clamp(18px,5vw,26px)}
+  .philo-attr{font-size:9px;margin-bottom:48px}
+  .philo-grid{grid-template-columns:1fr;gap:2px}
+  .philo-c{padding:28px 20px}
+
+  /* full section */
+  .full-section{height:45vh}
+  .full-text{font-size:clamp(32px,9vw,56px)}
+
+  /* testimonials */
+  .testi-grid{grid-template-columns:1fr;gap:2px}
+  .testi-text{font-size:15px}
+
+  /* contact */
+  .contact-grid{grid-template-columns:1fr;gap:48px}
+  .ct-title{font-size:clamp(48px,12vw,80px)}
+  .ct-p{font-size:14px}
+  .ct-ch{padding:16px}
+  .ch-val{font-size:13px}
+  .ct-map-img{aspect-ratio:16/9}
+
+  /* footer */
+  footer{grid-template-columns:1fr;text-align:center;padding:32px 20px;gap:16px}
+  .foot-copy{text-align:center}
+  .foot-nav{gap:16px}
+}
+
+/* ═══════════════════════════
+   TABLET  769–1024px
+═══════════════════════════ */
+@media(min-width:769px) and (max-width:1024px){
+  #about,#skills,#works,#extra,#education,#process,#hestore,#philosophy,#testimonials,#contact{
+    padding:80px 5vw
+  }
+  .about-cols{gap:40px}
+  .edu-wrap{gap:40px}
+  .edu-img-stack{height:380px}
+  .contact-grid{gap:48px}
+  .steps-grid{grid-template-columns:1fr 1fr;gap:2px}
+  .testi-grid{grid-template-columns:1fr 1fr;gap:2px}
+  .sk-row{grid-template-columns:60px 1fr auto;gap:20px}
+  .sk-desc{display:none}
+  .philo-grid{grid-template-columns:1fr 1fr;gap:2px}
+}
+
+/* also keep the 900px breakpoint for grid collapses */
+@media(max-width:900px){
+  .works-grid,.extra-grid,.extra-bottom,.store-layout,
+  .process-top-grid,.contact-grid,.edu-wrap,.about-cols{
+    grid-template-columns:1fr
+  }
   footer{grid-template-columns:1fr;text-align:center}
   .foot-copy{text-align:center}
-  .edu-img-stack{height:280px}
-  .sk-row{grid-template-columns:50px 1fr;gap:12px}
-  .sk-desc,.sk-pill{display:none}
-  .skills-sub-text,.works-note-txt{text-align:left}
 }
 </style>
 </head>
@@ -349,7 +502,6 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:40px 5vw
     <span class="hero-badge">Template Design</span>
     <span class="hero-badge">HE Store</span>
     <span class="hero-badge">Premium Apps</span>
-    <span class="hero-badge" data-key="hero_badge5">18 Years Old</span>
   </div>
   <div class="hero-cta-row">
     <a href="#works"   class="btn-blue"  data-key="btn_view">View Works ↓</a>
@@ -400,7 +552,6 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:40px 5vw
       <table class="detail-table">
         <tr><td data-key="td_name">Full Name</td><td>Zaenur Royhan Helmi</td></tr>
         <tr><td data-key="td_born">Date of Birth</td><td data-key="td_born_val">Monday, June 18, 2007</td></tr>
-        <tr><td data-key="td_age">Age</td><td data-key="td_age_val">18 Years Old</td></tr>
         <tr><td data-key="td_address">Address</td><td data-key="td_address_val">Mulaeno Village, Poleang Tengah,<br>Bombana Regency, Southeast Sulawesi</td></tr>
         <tr><td data-key="td_wa">WhatsApp</td><td><a href="https://wa.me/6281346807918" target="_blank">081346807918</a></td></tr>
         <tr><td data-key="td_email">Email</td><td><a href="mailto:zaenurroyhanh@gmail.com">zaenurroyhanh@gmail.com</a></td></tr>
@@ -413,7 +564,6 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:40px 5vw
 <div class="stats-strip rev">
   <div class="stat-cell"><div class="stat-n">5+</div><div class="stat-l" data-key="stat1">COMPLETED PROJECTS</div></div>
   <div class="stat-cell"><div class="stat-n">3</div><div class="stat-l" data-key="stat2">ACTIVE SERVICES</div></div>
-  <div class="stat-cell"><div class="stat-n">18</div><div class="stat-l" data-key="stat3">YEARS OLD</div></div>
   <div class="stat-cell"><div class="stat-n">∞</div><div class="stat-l" data-key="stat4">LEARNING SPIRIT</div></div>
 </div>
 
@@ -637,7 +787,7 @@ en:{
   nav_about:'About',nav_skills:'Skills',nav_works:'Works',nav_store:'HE Store',nav_contact:'Contact',nav_cta:'Contact ↗',
   hero_label:'✦ Portfolio & Company Information — 2025',
   hero_sub:'Web Developer · Template Designer · Founder of HE Store — crafting elegant and meaningful digital experiences from Southeast Sulawesi.',
-  hero_badge5:'18 Years Old',btn_view:'View Works ↓',btn_contact:'Contact Me →',scroll_lbl:'SCROLL TO EXPLORE',
+btn_view:'View Works ↓',btn_contact:'Contact Me →',scroll_lbl:'SCROLL TO EXPLORE',
   chip_about:'ABOUT ME',
   about_intro:'A young developer with <em>great passion</em> for building beautiful, functional, and memorable web experiences.',
   about_p1:'Zaenur Royhan Helmi was born and raised in Mulaeno Village, Bombana Regency, Southeast Sulawesi. From a young age, he has shown a strong interest in technology and digital design.',
@@ -646,10 +796,9 @@ en:{
   about_p4:'He believes that every website is not just a collection of code — but a <em style="color:var(--blue2)">story told visually</em>.',
   about_quote:'"I do not just build websites — I build experiences that make people pause and say: this is different."',
   td_name:'Full Name',td_born:'Date of Birth',td_born_val:'Monday, June 18, 2007',
-  td_age:'Age',td_age_val:'18 Years Old',
   td_address:'Address',td_address_val:'Mulaeno Village, Poleang Tengah,<br>Bombana Regency, Southeast Sulawesi',
   td_wa:'WhatsApp',td_email:'Email',td_tiktok:'TikTok',
-  stat1:'COMPLETED PROJECTS',stat2:'ACTIVE SERVICES',stat3:'YEARS OLD',stat4:'LEARNING SPIRIT',
+  stat1:'COMPLETED PROJECTS',stat2:'ACTIVE SERVICES',stat3:'SINCE 2024',stat4:'LEARNING SPIRIT',
   chip_skills:'CORE SKILLS',skills_h:'SKILL<br><em>Stack</em>',
   skills_sub:'Specializing in modern frontend technologies to build stunning, responsive, and high-performance interfaces.',
   sk1_d:'Semantic structure, responsive layouts, CSS animations, pixel-perfect styling.',
@@ -725,7 +874,7 @@ id:{
   nav_about:'Tentang',nav_skills:'Keahlian',nav_works:'Karya',nav_store:'HE Store',nav_contact:'Kontak',nav_cta:'Hubungi ↗',
   hero_label:'✦ Portfolio & Company Information — 2025',
   hero_sub:'Web Developer · Template Designer · Founder of HE Store — menciptakan pengalaman digital yang elegan dan bermakna dari Sulawesi Tenggara.',
-  hero_badge5:'18 Tahun',btn_view:'Lihat Karya ↓',btn_contact:'Hubungi Saya →',scroll_lbl:'SCROLL TO EXPLORE',
+btn_view:'Lihat Karya ↓',btn_contact:'Hubungi Saya →',scroll_lbl:'SCROLL TO EXPLORE',
   chip_about:'TENTANG SAYA',
   about_intro:'Seorang developer muda dengan <em>passion yang besar</em> untuk membangun pengalaman web yang indah, fungsional, dan berkesan.',
   about_p1:'Zaenur Royhan Helmi lahir dan besar di Desa Mulaeno, Kabupaten Bombana, Sulawesi Tenggara. Sejak usia muda, ia menunjukkan minat yang kuat terhadap teknologi dan desain digital.',
@@ -734,10 +883,9 @@ id:{
   about_p4:'Ia percaya bahwa setiap website bukan hanya kumpulan kode — melainkan <em style="color:var(--blue2)">cerita yang diceritakan secara visual</em>.',
   about_quote:'"Saya tidak sekadar membangun website — saya membangun pengalaman yang membuat orang berhenti dan berkata: ini berbeda."',
   td_name:'Nama Lengkap',td_born:'Tanggal Lahir',td_born_val:'Senin, 18 Juni 2007',
-  td_age:'Usia',td_age_val:'18 Tahun',
   td_address:'Alamat',td_address_val:'Desa Mulaeno, Kec. Poleang Tengah,<br>Kab. Bombana, Sulawesi Tenggara',
   td_wa:'WhatsApp',td_email:'Email',td_tiktok:'TikTok',
-  stat1:'PROYEK SELESAI',stat2:'LAYANAN AKTIF',stat3:'TAHUN USIA',stat4:'SEMANGAT BELAJAR',
+  stat1:'PROYEK SELESAI',stat2:'LAYANAN AKTIF',stat3:'SEJAK 2024',stat4:'SEMANGAT BELAJAR',
   chip_skills:'KEAHLIAN UTAMA',skills_h:'SKILL<br><em>Stack</em>',
   skills_sub:'Spesialisasi pada teknologi frontend modern untuk membangun antarmuka yang memukau, responsif, dan berperforma tinggi.',
   sk1_d:'Struktur semantik, layout responsif, animasi CSS, pixel-perfect styling.',
