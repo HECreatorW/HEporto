@@ -3,1115 +3,872 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>HE Porto — Zaenur Royhan Helmi</title>
+<title>Zaenur Royhan Helmi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#000;--bg2:#0a0a0a;--bg3:#111;--bg4:#1a1a1a;--panel:#1d1d1f;
-  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.18);
-  --white:#f5f5f7;--white2:#e8e8ed;--grey:#86868b;--grey2:#6e6e73;--muted:#515154;
-  --blue:#0071e3;--blue2:#2997ff;--blue3:#1a73e8;--tint:rgba(0,113,227,.12);
-  --font-hero:'Bebas Neue',sans-serif;--font-serif:'Cormorant Garamond',serif;
-  --font-body:'DM Sans',sans-serif;--font-mono:'Space Mono',monospace;
-  --nav-sc:rgba(0,0,0,.85);
+  --black:#000000;--white:#ffffff;
+  --g100:#0a0a0a;--g200:#111;--g300:#1a1a1a;--g400:#242424;--g500:#333;
+  --g600:#555;--g700:#888;--g800:#aaa;--g900:#ccc;--g950:#e8e8e8;
+  --text:#f5f5f5;--text-dim:rgba(245,245,245,.55);--text-muted:rgba(245,245,245,.28);
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.14);
+  --font-d:'Cormorant Garamond',Georgia,serif;
+  --font-b:'DM Sans',sans-serif;
+  --font-m:'Space Mono',monospace;
+  --g:clamp(24px,5vw,80px);
 }
-body.light{
-  --bg:#f5f5f7;--bg2:#fff;--bg3:#ebebee;--bg4:#e1e1e6;--panel:#fff;
-  --border:rgba(0,0,0,.08);--border2:rgba(0,0,0,.18);
-  --white:#1d1d1f;--white2:#2d2d2f;--grey:#515154;--grey2:#6e6e73;--muted:#ababb0;
-  --blue:#0071e3;--blue2:#0077ed;--blue3:#005bbf;--tint:rgba(0,113,227,.07);
-  --nav-sc:rgba(245,245,247,.92);
-}
-body.light #canvas3d{opacity:.08!important}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--white);font-family:var(--font-body);overflow-x:hidden;cursor:none;transition:background .4s,color .4s}
+body{background:var(--black);color:var(--text);font-family:var(--font-b);overflow-x:hidden;cursor:none}
 
-/* CONTROLS */
-#controls{position:fixed;bottom:24px;right:24px;z-index:800;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
-.ctrl-group{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
-.ctrl-lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;padding-right:4px}
-.ctrl-pills{display:flex;background:var(--bg3);border:1px solid var(--border2);border-radius:100px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.4)}
-.ctrl-pill{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;color:var(--grey);padding:8px 16px;cursor:pointer;transition:background .2s,color .2s;user-select:none;white-space:nowrap;border:none;background:transparent;display:block}
-.ctrl-pill.active{background:var(--blue);color:#fff}
-.ctrl-pill:not(.active):hover{background:var(--bg4);color:var(--white)}
+/* ── GRAIN ── */
+body::before{content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:180px;animation:grain .45s steps(1) infinite}
+@keyframes grain{0%{background-position:0 0}20%{background-position:-18% 8%}40%{background-position:-8% 28%}60%{background-position:18% 2%}80%{background-position:4% 38%}100%{background-position:0 0}}
 
-/* LOADER */
-#loader{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .7s .3s,visibility .7s .3s}
+/* ── CURSOR ── */
+#cur{width:38px;height:38px;border:1px solid rgba(255,255,255,.5);border-radius:50%;position:fixed;top:-19px;left:-19px;pointer-events:none;z-index:9998;mix-blend-mode:difference;transition:width .25s,height .25s,background .25s}
+#cur-dot{width:4px;height:4px;background:#fff;border-radius:50%;position:fixed;top:-2px;left:-2px;pointer-events:none;z-index:9999}
+#cur.hov{width:68px;height:68px;background:rgba(255,255,255,.1)}
+@media(pointer:coarse){#cur,#cur-dot{display:none}body{cursor:auto}}
+
+/* ── LOADER ── */
+#loader{position:fixed;inset:0;z-index:8999;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .8s .15s,visibility .8s .15s}
 #loader.gone{opacity:0;visibility:hidden;pointer-events:none}
-.ld-logo{font-family:var(--font-hero);font-size:clamp(36px,5vw,64px);letter-spacing:.2em;color:#f5f5f7;margin-bottom:36px}
-.ld-bar{width:240px;height:1px;background:rgba(255,255,255,.1);position:relative;overflow:hidden}
-.ld-fill{position:absolute;top:0;left:0;height:100%;width:0;background:#2997ff}
-.ld-pct{font-family:var(--font-mono);font-size:10px;color:#86868b;margin-top:14px;letter-spacing:.25em}
+.ld-txt{font-family:var(--font-m);font-size:11px;letter-spacing:.4em;color:rgba(255,255,255,.3);margin-bottom:48px;text-transform:uppercase}
+.ld-bar{width:180px;height:1px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.ld-f{position:absolute;inset:0 100% 0 0;background:#fff;transition:right .06s linear}
+.ld-n{font-family:var(--font-m);font-size:9px;color:rgba(255,255,255,.2);margin-top:12px;letter-spacing:.35em}
 
-/* CURSOR */
-#cur{position:fixed;width:8px;height:8px;background:var(--white);border-radius:50%;pointer-events:none;z-index:9000;transform:translate(-50%,-50%);transition:width .3s,height .3s}
-#cur-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(255,255,255,.25);border-radius:50%;pointer-events:none;z-index:8999;transform:translate(-50%,-50%);transition:width .4s,height .4s,border-color .3s}
-.hover-cur #cur{width:20px;height:20px;background:var(--blue2);opacity:.8}
-.hover-cur #cur-ring{width:52px;height:52px;border-color:var(--blue2)}
-#prog{position:fixed;top:0;left:0;height:1px;background:var(--blue2);z-index:600;width:0;transition:width .1s}
+/* ── PROG ── */
+#prog-v{position:fixed;right:20px;top:0;bottom:0;width:1px;background:rgba(255,255,255,.06);z-index:200}
+#prog-fill{position:absolute;top:0;left:0;right:0;background:#fff;height:0;transition:height .08s linear}
+#prog-pct{position:absolute;bottom:calc(100% - var(--ph,0px) + 8px);right:6px;font-family:var(--font-m);font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,.3);writing-mode:vertical-rl}
 
-/* NAV — FIX: no overflow, gap-based, no wrapping */
-nav#nav{
-  position:fixed;top:0;left:0;right:0;z-index:500;
-  height:64px;padding:0 40px;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:24px;
-  transition:background .4s,backdrop-filter .4s;
+/* ── CHAPTER DOTS ── */
+#chapters{position:fixed;left:20px;top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;gap:12px}
+.ch-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:background .3s,transform .3s;border:none;padding:0}
+.ch-dot.active{background:#fff;transform:scale(1.4)}
+.ch-dot:hover{background:rgba(255,255,255,.6)}
+@media(max-width:768px){#chapters,#prog-v{display:none}}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:60px;padding:0 var(--g);display:flex;align-items:center;justify-content:space-between;transition:background .4s}
+nav.s{background:rgba(0,0,0,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--font-d);font-size:19px;letter-spacing:.2em;color:var(--text);text-decoration:none;font-weight:300}
+.nav-r{display:flex;align-items:center;gap:28px}
+.nav-links{display:flex;gap:24px;list-style:none}
+.nav-links a{font-family:var(--font-m);font-size:10px;letter-spacing:.15em;color:var(--text-muted);text-decoration:none;transition:color .3s;text-transform:uppercase}
+.nav-links a:hover{color:var(--text)}
+.mbtn{display:none;font-family:var(--font-m);font-size:9px;letter-spacing:.2em;color:var(--text-muted);background:none;border:1px solid var(--border2);padding:8px 14px;cursor:pointer;text-transform:uppercase;transition:border-color .3s,color .3s;min-width:44px;min-height:44px}
+.mbtn:hover{border-color:#fff;color:#fff}
+@media(max-width:768px){.nav-links{display:none}.mbtn{display:flex;align-items:center;justify-content:center}}
+
+/* ── OVERLAY MENU ── */
+#menu{position:fixed;inset:0;z-index:490;background:#000;display:flex;flex-direction:column;justify-content:center;padding:var(--g) calc(var(--g)*1.5);transform:translateX(100%);transition:transform .7s cubic-bezier(.76,0,.24,1)}
+#menu.open{transform:translateX(0)}
+.mi{font-family:var(--font-d);font-size:clamp(48px,10vw,110px);font-weight:300;line-height:1;color:rgba(255,255,255,.18);text-decoration:none;display:block;border-bottom:1px solid var(--border);padding:16px 0;transition:color .3s,padding-left .4s}
+.mi:hover{color:#fff;padding-left:16px}
+.mclose{position:absolute;top:20px;right:var(--g);font-family:var(--font-m);font-size:10px;letter-spacing:.2em;color:var(--text-muted);background:none;border:none;cursor:pointer;padding:10px;text-transform:uppercase;min-width:44px;min-height:44px}
+
+/* ── HERO — SCATTERED LETTERS (Anton & Irene) ── */
+#hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:100px var(--g) 120px;overflow:hidden;z-index:2}
+.hero-eyebrow{font-family:var(--font-m);font-size:9px;letter-spacing:.35em;color:var(--text-muted);text-transform:uppercase;margin-bottom:40px;opacity:0;animation:fdin .8s .2s ease forwards;position:relative;z-index:3}
+#scattered-name{position:relative;width:100%;height:clamp(160px,26vw,420px);margin-bottom:0;z-index:3}
+#hero-sub-row{display:flex;justify-content:space-between;align-items:flex-end;margin-top:48px;flex-wrap:wrap;gap:28px;opacity:0;animation:fdin .9s .9s ease forwards;position:relative;z-index:3}
+.hero-sub{font-size:16px;color:var(--text-dim);max-width:400px;line-height:1.8}
+.hero-meta{text-align:right}
+.hm-row{font-family:var(--font-m);font-size:9px;letter-spacing:.22em;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase}
+.hm-row span{color:var(--text-dim)}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:24px;justify-content:flex-end}
+@keyframes fdin{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.scroll-cue{position:absolute;left:var(--g);bottom:40px;display:flex;align-items:center;gap:14px;opacity:0;animation:fdin .9s 1.1s ease forwards;z-index:3}
+.sc-line{width:40px;height:1px;background:rgba(255,255,255,.12);overflow:hidden;position:relative}
+.sc-line::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:#fff;animation:scan 2.4s 1.3s ease-in-out infinite}
+@keyframes scan{0%{left:-100%}100%{left:100%}}
+.sc-lbl{font-family:var(--font-m);font-size:9px;letter-spacing:.25em;color:var(--text-muted);text-transform:uppercase}
+
+/* ── HERO MOBILE ── */
+@media(max-width:768px){
+  #hero{padding:88px 24px 100px;justify-content:flex-end;min-height:100svh}
+  .hero-eyebrow{margin-bottom:28px;font-size:8px;letter-spacing:.25em}
+  #scattered-name{height:clamp(120px,36vw,180px);margin-bottom:0}
+  #hero-sub-row{flex-direction:column;align-items:flex-start;margin-top:32px;gap:20px}
+  .hero-sub{font-size:15px;max-width:100%}
+  .hero-meta{text-align:left;width:100%}
+  .hero-ctas{justify-content:flex-start;flex-direction:column;gap:10px;width:100%}
+  .btn-w,.btn-o{width:100%;justify-content:center;font-size:11px;padding:16px 24px;min-height:52px}
+  .scroll-cue{bottom:28px}
 }
-nav#nav.scrolled{background:var(--nav-sc);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
-.nav-logo{font-family:var(--font-hero);font-size:22px;letter-spacing:.15em;color:var(--white);text-decoration:none;flex-shrink:0;white-space:nowrap}
-.nav-logo span{color:var(--blue2)}
-.nav-links{display:flex;gap:20px;list-style:none;align-items:center;flex:1;justify-content:center;flex-wrap:nowrap}
-.nav-links li{flex-shrink:0}
-.nav-links a{font-size:13px;color:var(--grey);text-decoration:none;transition:color .3s;white-space:nowrap}
-.nav-links a:hover{color:var(--white)}
-.nav-cta{font-size:13px;color:#fff;background:var(--blue);padding:8px 20px;border-radius:20px;text-decoration:none;flex-shrink:0;white-space:nowrap;transition:background .3s}
-.nav-cta:hover{background:var(--blue3)}
-@media(max-width:900px){.nav-links,.nav-cta{display:none}}
 
-#canvas3d{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;opacity:.55}
+/* ── PARALLAX LAYERS inside hero (Firewatch — monochrome) */
+#parallax{position:absolute;inset:0;pointer-events:none;z-index:0}
+.p-layer{position:absolute;bottom:0;left:0;right:0;will-change:transform}
+.p-layer svg{width:100%;height:auto;display:block}
+#hero>*:not(#parallax){position:relative;z-index:2}
 
-/* HERO */
-#hero{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 5vw 80px}
-.hero-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;color:var(--blue2);text-transform:uppercase;margin-bottom:32px;opacity:0;animation:fup 1s .4s ease forwards}
-.hero-h1{font-family:var(--font-hero);font-size:clamp(90px,15vw,210px);line-height:1;letter-spacing:.01em;color:var(--white);opacity:0;animation:fup 1s .6s ease forwards}
-.hero-h1 .ital{font-family:var(--font-serif);font-style:italic;font-weight:300;color:var(--blue2);display:block;font-size:clamp(70px,12vw,170px);line-height:1}
-.hero-sub{margin-top:36px;font-size:17px;color:var(--grey);max-width:480px;line-height:1.7;opacity:0;animation:fup 1s .8s ease forwards}
-.hero-badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;opacity:0;animation:fup 1s 1s ease forwards}
-.hero-badge{font-size:12px;color:var(--grey2);border:1px solid var(--border);padding:6px 16px;border-radius:100px;transition:border-color .3s,color .3s}
-.hero-badge:hover{border-color:var(--blue2);color:var(--white)}
-.hero-cta-row{display:flex;gap:16px;margin-top:40px;opacity:0;animation:fup 1s 1.1s ease forwards;flex-wrap:wrap}
-.hero-meta{position:absolute;right:5vw;bottom:80px;text-align:right;opacity:0;animation:fup 1s 1.2s ease forwards}
-.hero-meta-item{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:8px}
-.hero-meta-item span{color:var(--grey)}
-.scroll-cue{position:absolute;left:5vw;bottom:60px;display:flex;align-items:center;gap:14px;opacity:0;animation:fup 1s 1.4s ease forwards}
-.scroll-line{width:48px;height:1px;background:rgba(255,255,255,.15);position:relative;overflow:hidden}
-.scroll-line::after{content:'';position:absolute;left:-100%;top:0;width:100%;height:100%;background:var(--blue2);animation:scanline 2.5s 1.6s ease-in-out infinite}
-@keyframes scanline{0%{left:-100%}100%{left:100%}}
-.scroll-lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.25em;color:var(--muted)}
-@keyframes fup{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+/* ── BUTTONS ── */
+.btn-w{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#000;font-family:var(--font-m);font-size:10px;letter-spacing:.14em;padding:14px 28px;text-decoration:none;text-transform:uppercase;transition:background .2s,transform .2s;min-height:44px;position:relative;z-index:10}
+.btn-w:hover{background:var(--g950);transform:translateY(-1px)}
+.btn-o{display:inline-flex;align-items:center;gap:8px;background:transparent;color:#fff;font-family:var(--font-m);font-size:10px;letter-spacing:.14em;padding:14px 28px;border:1px solid rgba(255,255,255,.4);text-decoration:none;text-transform:uppercase;transition:border-color .3s,background .3s;min-height:44px;position:relative;z-index:10}
+.btn-o:hover{border-color:#fff;background:rgba(255,255,255,.08)}
+.magnetic{transition:transform .5s cubic-bezier(.23,1,.32,1)}
 
-.btn-blue{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:#fff;font-size:14px;font-weight:500;padding:14px 28px;border-radius:100px;text-decoration:none;transition:background .3s,transform .2s}
-.btn-blue:hover{background:var(--blue3);transform:translateY(-1px)}
-.btn-ghost{display:inline-flex;align-items:center;gap:8px;color:var(--blue2);font-size:14px;font-weight:500;padding:14px 28px;border-radius:100px;border:1px solid rgba(41,151,255,.3);text-decoration:none;transition:background .3s,border-color .3s}
-.btn-ghost:hover{background:var(--tint);border-color:var(--blue2)}
+/* ── REVEAL ── */
+[data-r]{opacity:0;transform:translateY(44px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+[data-r].on{opacity:1;transform:none}
+[data-rl]{opacity:0;transform:translateX(-44px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+[data-rl].on{opacity:1;transform:none}
+[data-rr]{opacity:0;transform:translateX(44px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+[data-rr].on{opacity:1;transform:none}
 
-.rev{opacity:0;transform:translateY(48px);transition:opacity .8s,transform .8s}
-.rev.on{opacity:1;transform:none}
-.rev-l{opacity:0;transform:translateX(-48px);transition:opacity .8s,transform .8s}
-.rev-l.on{opacity:1;transform:none}
-.rev-r{opacity:0;transform:translateX(48px);transition:opacity .8s,transform .8s}
-.rev-r.on{opacity:1;transform:none}
-
-section,footer,.marquee-belt,.stats-strip,.photo-strip,.full-section{position:relative;z-index:2}
-
-.sec-chip{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:10px;letter-spacing:.25em;color:var(--blue2);text-transform:uppercase;padding:6px 14px;border:1px solid rgba(41,151,255,.25);border-radius:100px;margin-bottom:28px}
-.sec-chip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue2);flex-shrink:0}
-
-.marquee-belt{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0;background:var(--bg2)}
-.m-track{display:inline-flex;gap:56px;white-space:nowrap;animation:mq 28s linear infinite}
-.m-item{font-family:var(--font-body);font-size:14px;font-weight:300;color:var(--muted);letter-spacing:.05em}
-.m-item b{color:var(--blue2)}
+/* ── MARQUEE ── */
+.mqbelt{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0;background:var(--g100)}
+.mq-track{display:flex;width:max-content;animation:mq 32s linear infinite}
+.mq-item{font-family:var(--font-m);font-size:11px;letter-spacing:.12em;color:var(--text-muted);white-space:nowrap;padding:0 28px;text-transform:uppercase}
+.mq-item b{color:rgba(255,255,255,.45)}
 @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-#about{background:var(--bg2);padding:100px 5vw}
-.about-intro-text{font-family:var(--font-serif);font-size:clamp(28px,3.5vw,50px);font-weight:300;line-height:1.3;color:var(--white);max-width:900px;margin-bottom:60px}
-.about-intro-text em{color:var(--blue2);font-style:italic}
+/* ── SEC LABEL ── */
+.sec-lbl{font-family:var(--font-m);font-size:9px;letter-spacing:.35em;color:var(--text-muted);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:32px}
+.sec-lbl::before{content:'';width:24px;height:1px;background:rgba(255,255,255,.3);flex-shrink:0}
+
+/* ── BIG HEADING ── */
+.big-h{font-family:var(--font-d);font-size:clamp(52px,8vw,110px);line-height:.9;font-weight:300;letter-spacing:-.01em;color:#fff}
+.big-h em{font-style:italic;color:rgba(255,255,255,.5)}
+
+/* ── ABOUT ── */
+#about{background:var(--g100);padding:clamp(80px,12vh,140px) var(--g)}
+.about-intro{font-family:var(--font-d);font-size:clamp(24px,3vw,44px);font-weight:300;line-height:1.35;color:#fff;max-width:820px;margin-bottom:72px}
+.about-intro em{font-style:italic;color:rgba(255,255,255,.55)}
 .about-cols{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
-.about-body-text{font-size:16px;color:var(--grey);line-height:1.9;margin-bottom:20px}
-.detail-table{width:100%;border-collapse:collapse;margin-top:32px}
-.detail-table tr{border-bottom:1px solid var(--border)}
-.detail-table td{padding:14px 0;font-size:14px;vertical-align:top}
-.detail-table td:first-child{font-family:var(--font-mono);font-size:10px;letter-spacing:.15em;color:var(--muted);width:130px;text-transform:uppercase}
-.detail-table td:last-child{color:var(--white2)}
-.detail-table td a{color:var(--blue2);text-decoration:none}
-.about-quote{border-left:2px solid var(--blue2);padding-left:24px;margin-bottom:36px}
-.about-quote p{font-family:var(--font-serif);font-size:21px;font-style:italic;font-weight:300;color:var(--white2);line-height:1.6}
-.tag-cloud{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
-.chip{font-size:12px;color:var(--grey2);border:1px solid var(--border);padding:7px 16px;border-radius:100px;transition:all .3s}
-.chip:hover{border-color:var(--blue2);color:var(--white);background:var(--tint)}
+.ap{font-size:15px;color:var(--text-dim);line-height:1.9;margin-bottom:18px}
+.tc{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+.chip{font-family:var(--font-m);font-size:10px;letter-spacing:.1em;color:var(--text-muted);border:1px solid var(--border2);padding:7px 16px;text-transform:uppercase;transition:all .3s;cursor:default}
+.chip:hover{border-color:#fff;color:#fff}
+.aq{border-left:1px solid rgba(255,255,255,.3);padding-left:24px;margin-bottom:36px}
+.aq p{font-family:var(--font-d);font-size:18px;font-style:italic;font-weight:300;color:var(--text-dim);line-height:1.65}
+.dtab{width:100%;border-collapse:collapse;margin-top:24px}
+.dtab tr{border-bottom:1px solid var(--border)}
+.dtab td{padding:12px 0;font-size:13px;vertical-align:top}
+.dtab td:first-child{font-family:var(--font-m);font-size:9px;letter-spacing:.18em;color:var(--text-muted);width:110px;text-transform:uppercase}
+.dtab td:last-child{color:var(--text-dim)}
+.dtab td a{color:#fff;text-decoration:none;transition:color .3s}
+.dtab td a:hover{color:var(--g900)}
+@media(max-width:768px){.about-cols{grid-template-columns:1fr;gap:48px}}
 
-.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg3)}
-.stat-cell{padding:48px 0;text-align:center;border-right:1px solid var(--border)}
-.stat-cell:last-child{border-right:none}
-.stat-n{font-family:var(--font-hero);font-size:60px;color:var(--blue2);line-height:1}
-.stat-l{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--muted);margin-top:8px}
+/* ── STATS ── */
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--g200)}
+.st-cell{padding:52px 0;text-align:center;border-right:1px solid var(--border)}
+.st-cell:last-child{border-right:none}
+.st-n{font-family:var(--font-d);font-size:clamp(52px,7vw,84px);color:#fff;line-height:1;font-weight:300}
+.st-l{font-family:var(--font-m);font-size:9px;letter-spacing:.24em;color:var(--text-muted);margin-top:10px;text-transform:uppercase}
 
-.photo-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
-.ps-item{aspect-ratio:3/4;overflow:hidden;position:relative;background:var(--bg3)}
-.ps-item img{width:100%;height:100%;object-fit:cover;transition:transform .6s,filter .4s;filter:brightness(.8)grayscale(10%)}
-.ps-item:hover img{transform:scale(1.05);filter:brightness(1)grayscale(0)}
-.ps-cap{position:absolute;bottom:0;left:0;right:0;padding:18px;background:linear-gradient(transparent,rgba(0,0,0,.8));font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--blue2);opacity:0;transform:translateY(6px);transition:all .4s}
-.ps-item:hover .ps-cap{opacity:1;transform:none}
+/* ── SKILLS ── */
+#skills{padding:clamp(80px,12vh,140px) var(--g);background:var(--black)}
+.sk-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:64px;gap:40px;flex-wrap:wrap}
+.sk-sub{font-size:14px;color:var(--text-dim);max-width:260px;line-height:1.85;text-align:right}
+.sk-rows{border-top:1px solid var(--border)}
+.sk-row{display:grid;grid-template-columns:56px 1fr 1.6fr auto;align-items:center;gap:28px;padding:24px 12px;border-bottom:1px solid var(--border);cursor:default;transition:background .3s}
+.sk-row:hover{background:var(--g200)}
+.sk-i{font-family:var(--font-m);font-size:9px;color:var(--text-muted)}
+.sk-name{font-family:var(--font-d);font-size:clamp(22px,2.5vw,34px);font-weight:300;color:var(--text-dim);transition:color .3s}
+.sk-row:hover .sk-name{color:#fff}
+.sk-desc{font-size:13px;color:var(--text-muted);line-height:1.7}
+.sk-lvl{font-family:var(--font-m);font-size:9px;letter-spacing:.12em;color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.14);padding:4px 12px;text-transform:uppercase;white-space:nowrap;transition:border-color .3s,color .3s}
+.sk-row:hover .sk-lvl{border-color:rgba(255,255,255,.4);color:#fff}
+@media(max-width:768px){.sk-row{grid-template-columns:36px 1fr;gap:12px}.sk-desc,.sk-lvl{display:none}.sk-sub{text-align:left}}
 
-#skills{padding:100px 5vw;background:var(--bg)}
-.skills-hero{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:70px;gap:40px;flex-wrap:wrap}
-.big-h{font-family:var(--font-hero);font-size:clamp(56px,8vw,110px);line-height:.9;letter-spacing:-.01em}
-.big-h em{font-family:var(--font-serif);font-style:italic;color:var(--blue2)}
-.skills-sub-text{font-size:14px;color:var(--grey);max-width:300px;line-height:1.8;text-align:right}
-.skills-rows{border-top:1px solid var(--border)}
-.sk-row{display:grid;grid-template-columns:70px 1fr 1.4fr auto;align-items:center;gap:40px;padding:28px 20px;border-bottom:1px solid var(--border);cursor:default;transition:background .3s}
-.sk-row:hover{background:var(--bg3)}
-.sk-idx{font-family:var(--font-mono);font-size:10px;color:var(--muted)}
-.sk-name{font-family:var(--font-hero);font-size:clamp(22px,2.5vw,32px);letter-spacing:.05em;color:var(--white);transition:color .3s}
-.sk-row:hover .sk-name{color:var(--blue2)}
-.sk-desc{font-size:13px;color:var(--grey);line-height:1.7}
-.sk-pill{font-size:11px;color:#fff;background:var(--blue2);padding:5px 14px;border-radius:100px;white-space:nowrap}
+/* ── WORKS — LIST + FLOATING PREVIEW (Anton & Irene) ── */
+#works{padding:clamp(80px,12vh,140px) var(--g);background:var(--g100);position:relative}
+.w-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;gap:40px;flex-wrap:wrap}
+.w-note{font-size:14px;color:var(--text-dim);max-width:240px;line-height:1.85;text-align:right}
+/* Floating preview */
+#wpreview{position:fixed;width:280px;height:200px;pointer-events:none;z-index:300;opacity:0;transform:scale(.94);transition:opacity .35s,transform .35s;border:1px solid var(--border2)}
+#wpreview.vis{opacity:1;transform:scale(1)}
+#wpreview img{width:100%;height:100%;object-fit:cover;filter:grayscale(20%)}
+/* Work list */
+.w-list{list-style:none;border-top:1px solid var(--border)}
+.w-item{border-bottom:1px solid var(--border);transition:background .3s}
+.w-item:hover{background:var(--g200)}
+.w-item a{display:grid;grid-template-columns:52px 1fr auto auto;align-items:center;gap:24px;padding:28px 12px;text-decoration:none;min-height:44px}
+.wi-num{font-family:var(--font-m);font-size:9px;color:var(--text-muted)}
+.wi-title{font-family:var(--font-d);font-size:clamp(22px,2.8vw,38px);font-weight:300;color:var(--text-dim);transition:color .3s}
+.w-item:hover .wi-title{color:#fff}
+.wi-tags{display:flex;gap:6px;flex-wrap:wrap}
+.wi-tag{font-family:var(--font-m);font-size:9px;letter-spacing:.1em;color:var(--text-muted);border:1px solid var(--border);padding:3px 10px;text-transform:uppercase}
+.wi-arr{font-family:var(--font-m);font-size:11px;color:var(--text-muted);transition:color .3s,transform .3s;display:inline-block}
+.w-item:hover .wi-arr{color:#fff;transform:translateX(6px)}
+@media(max-width:768px){.w-item a{grid-template-columns:36px 1fr auto}.wi-tags{display:none}.w-note{text-align:left}}
 
-#works{padding:100px 5vw;background:var(--bg2)}
-.works-top{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:60px;gap:40px;flex-wrap:wrap}
-.works-note-txt{font-size:14px;color:var(--grey);max-width:280px;line-height:1.8;text-align:right}
-.works-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
-.w-item{position:relative;overflow:hidden;background:var(--bg3);display:block;text-decoration:none;aspect-ratio:16/10}
-.w-item.big{grid-column:1/-1;aspect-ratio:21/9}
-.w-img{width:100%;height:100%;object-fit:cover;transition:transform .7s,filter .5s}
-.w-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88) 0%,rgba(0,0,0,.2) 60%,transparent 100%)}
-.w-item:hover .w-img{transform:scale(1.04);filter:brightness(1.05)}
-.w-body{position:absolute;bottom:0;left:0;right:0;padding:32px;z-index:2}
-.w-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.w-tag{font-size:10px;font-family:var(--font-mono);letter-spacing:.12em;padding:3px 10px;border:1px solid rgba(41,151,255,.35);color:var(--blue2);border-radius:100px}
-.w-title{font-family:var(--font-hero);font-size:clamp(20px,2.8vw,38px);letter-spacing:.04em;color:#fff;margin-bottom:6px}
-.w-desc{font-size:13px;color:rgba(255,255,255,.55);margin-bottom:16px}
-.w-arrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.15em;color:var(--blue2);transition:gap .3s}
-.w-item:hover .w-arrow{gap:14px}
-.w-num{position:absolute;top:20px;right:20px;font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,.2)}
+/* ── SWAY DIVIDER (The Boat) ── */
+.sway-div{height:180px;background:var(--g100);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.sway-txt{font-family:var(--font-d);font-size:clamp(32px,5vw,72px);font-weight:300;font-style:italic;color:rgba(255,255,255,.12);white-space:nowrap;animation:sway-g 7s ease-in-out infinite;letter-spacing:.06em}
+@keyframes sway-g{0%,100%{transform:rotate(-.35deg) translateX(-4px)}50%{transform:rotate(.35deg) translateX(4px)}}
 
-#education{background:var(--bg);padding:100px 5vw}
-.edu-wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:100px;align-items:start}
-.edu-intro-p{font-size:15px;color:var(--grey);line-height:1.9;margin-bottom:30px}
-.edu-timeline{border-top:1px solid var(--border)}
-.edu-item{padding:32px 0;border-bottom:1px solid var(--border);display:flex;gap:24px;align-items:flex-start}
-.edu-dot{width:10px;height:10px;border-radius:50%;background:var(--blue2);flex-shrink:0;margin-top:7px;box-shadow:0 0 14px var(--blue2)}
-.edu-level{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--blue2);margin-bottom:8px}
-.edu-school{font-family:var(--font-hero);font-size:clamp(18px,2.2vw,26px);letter-spacing:.05em;color:var(--white);margin-bottom:4px}
-.edu-loc{font-size:13px;color:var(--grey2)}
-.edu-img-stack{position:relative;height:560px}
-.ei1{position:absolute;top:0;left:0;width:68%;height:75%;object-fit:cover;filter:grayscale(15%)}
-.ei2{position:absolute;bottom:0;right:0;width:58%;height:65%;object-fit:cover;filter:grayscale(15%)}
-.ei3{position:absolute;top:40%;left:20%;width:40%;height:35%;object-fit:cover;filter:grayscale(10%);border:2px solid var(--bg);z-index:2}
+/* ── EDUCATION ── */
+#education{padding:clamp(80px,12vh,140px) var(--g);background:var(--black)}
+.edu-wrap{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.edu-p{font-size:15px;color:var(--text-dim);line-height:1.9;margin-bottom:20px}
+.edu-tl{border-top:1px solid var(--border);margin-top:8px}
+.edu-item{padding:28px 0;border-bottom:1px solid var(--border);display:flex;gap:18px;align-items:flex-start}
+.edu-dot{width:7px;height:7px;border-radius:50%;background:#fff;flex-shrink:0;margin-top:9px;box-shadow:0 0 10px rgba(255,255,255,.4)}
+.edu-lv{font-family:var(--font-m);font-size:9px;letter-spacing:.22em;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase}
+.edu-school{font-family:var(--font-d);font-size:clamp(18px,2.2vw,26px);font-weight:300;color:#fff;margin-bottom:4px}
+.edu-loc{font-size:13px;color:var(--text-muted)}
+/* stacked imgs */
+.edu-imgs{position:relative;height:480px}
+.ei{position:absolute;object-fit:cover;filter:brightness(.65)grayscale(20%);transition:filter .4s}
+.ei:hover{filter:brightness(.9)grayscale(0)}
+.ei1{top:0;left:0;width:66%;height:70%}
+.ei2{bottom:0;right:0;width:56%;height:62%}
+.ei3{top:36%;left:20%;width:34%;height:30%;border:2px solid var(--black);z-index:2}
+@media(max-width:768px){.edu-wrap{grid-template-columns:1fr;gap:40px}.edu-imgs{height:300px}}
 
-#process{background:var(--bg2);padding:100px 5vw}
-.process-top-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:80px}
-.process-img{width:100%;aspect-ratio:16/10;object-fit:cover;filter:brightness(.9)}
-.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px}
-.step-c{background:var(--bg3);padding:44px 28px;border-top:1px solid var(--border);transition:background .3s,border-color .3s}
-.step-c:hover{background:var(--panel);border-color:var(--blue2)}
-.step-n{font-family:var(--font-hero);font-size:52px;color:rgba(41,151,255,.1);line-height:1;margin-bottom:16px}
-.step-title{font-family:var(--font-hero);font-size:18px;letter-spacing:.06em;color:var(--white);margin-bottom:10px}
-.step-text{font-size:13px;color:var(--grey2);line-height:1.8}
+/* ── PROCESS ── */
+#process{padding:clamp(80px,12vh,140px) var(--g);background:var(--g100)}
+.proc-top{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;margin-bottom:64px}
+.proc-img{width:100%;aspect-ratio:16/10;object-fit:cover;filter:brightness(.6)grayscale(25%)}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px}
+.step-c{background:var(--g200);padding:40px 24px;border-top:1px solid rgba(255,255,255,.06);transition:background .3s,border-top-color .3s}
+.step-c:hover{background:var(--g300);border-top-color:rgba(255,255,255,.4)}
+.step-n{font-family:var(--font-d);font-size:52px;font-weight:300;color:rgba(255,255,255,.08);line-height:1;margin-bottom:14px}
+.step-t{font-family:var(--font-m);font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.5);margin-bottom:10px;text-transform:uppercase}
+.step-p{font-size:13px;color:var(--text-muted);line-height:1.8}
+@media(max-width:768px){.proc-top{grid-template-columns:1fr;gap:40px}.steps-grid{grid-template-columns:1fr 1fr}}
 
-#hestore{background:var(--bg);padding:100px 5vw}
-.store-big-img{width:100%;aspect-ratio:21/9;object-fit:cover;display:block;margin-bottom:80px;filter:brightness(.8)}
-.store-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;margin-bottom:60px}
-.store-h{font-family:var(--font-hero);font-size:clamp(36px,5vw,70px);line-height:.95;letter-spacing:-.01em;margin-bottom:28px}
-.store-h em{font-family:var(--font-serif);font-style:italic;color:var(--blue2)}
-.store-p{font-size:15px;color:var(--grey);line-height:1.9;margin-bottom:16px}
-.svc-list{display:flex;flex-direction:column;gap:2px}
-.svc-c{background:var(--bg3);padding:32px;display:flex;gap:20px;align-items:flex-start;border-left:2px solid transparent;transition:border-color .3s,background .3s}
-.svc-c:hover{border-left-color:var(--blue2);background:var(--bg2)}
-.svc-ico{font-size:24px;flex-shrink:0;margin-top:2px}
-.svc-nm{font-family:var(--font-hero);font-size:16px;letter-spacing:.06em;color:var(--white);margin-bottom:8px}
-.svc-tx{font-size:13px;color:var(--grey2);line-height:1.8}
-.svc-tag{display:inline-block;margin-top:10px;font-size:11px;color:var(--blue2);font-family:var(--font-mono);letter-spacing:.1em;border:1px solid rgba(41,151,255,.25);padding:3px 10px;border-radius:100px}
-.store-cta-block{background:var(--bg3);border:1px solid var(--border);padding:56px;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap}
-.store-cta-block h4{font-family:var(--font-hero);font-size:clamp(26px,3vw,44px);letter-spacing:.02em}
-.store-cta-block h4 em{font-family:var(--font-serif);font-style:italic;color:var(--blue2)}
-.store-cta-block p{font-size:14px;color:var(--grey);max-width:300px;line-height:1.8;margin-top:8px}
+/* ── HE STORE ── */
+#hestore{padding:clamp(80px,12vh,140px) var(--g);background:var(--black)}
+.hs-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;margin-bottom:56px}
+.hs-h{margin-bottom:28px}
+.hs-p{font-size:15px;color:var(--text-dim);line-height:1.9;margin-bottom:14px}
+.svc-list{display:flex;flex-direction:column;gap:1px}
+.svc-c{background:var(--g200);padding:28px 24px;display:flex;gap:16px;align-items:flex-start;border-left:1px solid transparent;transition:border-left-color .3s,background .3s}
+.svc-c:hover{border-left-color:#fff;background:var(--g300)}
+.svc-ico{flex-shrink:0;color:rgba(255,255,255,.4);margin-top:2px;transition:color .3s}
+.svc-c:hover .svc-ico{color:#fff}
+.svc-nm{font-family:var(--font-m);font-size:10px;letter-spacing:.18em;color:rgba(255,255,255,.6);margin-bottom:8px;text-transform:uppercase}
+.svc-tx{font-size:13px;color:var(--text-muted);line-height:1.8}
+.svc-tag{display:inline-block;margin-top:10px;font-family:var(--font-m);font-size:9px;letter-spacing:.14em;color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.12);padding:3px 10px;text-transform:uppercase}
+.hs-cta{background:var(--g200);border:1px solid var(--border);padding:44px;display:flex;justify-content:space-between;align-items:center;gap:36px;flex-wrap:wrap}
+.hs-cta-h{font-family:var(--font-d);font-size:clamp(22px,3vw,38px);font-weight:300;color:#fff}
+.hs-cta-h em{font-style:italic;color:rgba(255,255,255,.5)}
+.hs-cta p{font-size:14px;color:var(--text-dim);margin-top:10px;line-height:1.75;max-width:380px}
+@media(max-width:768px){.hs-layout{grid-template-columns:1fr;gap:48px}}
 
-#philosophy{background:var(--bg2);padding:100px 5vw;text-align:center}
-.philo-q{font-family:var(--font-serif);font-size:clamp(24px,3.5vw,48px);font-weight:300;font-style:italic;line-height:1.4;color:var(--white2);max-width:880px;margin:0 auto 24px}
-.philo-q em{color:var(--blue2)}
-.philo-attr{font-family:var(--font-mono);font-size:10px;letter-spacing:.25em;color:var(--muted);margin-bottom:80px}
-.philo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;text-align:left}
-.philo-c{background:var(--bg3);padding:44px 32px;border-top:1px solid var(--border);transition:background .3s,border-color .3s}
-.philo-c:hover{background:var(--panel);border-top-color:var(--blue2)}
-.philo-ico{font-size:28px;margin-bottom:20px}
-.philo-nm{font-family:var(--font-hero);font-size:18px;letter-spacing:.06em;color:var(--white);margin-bottom:10px}
-.philo-tx{font-size:13px;color:var(--grey2);line-height:1.8}
+/* ── PHILOSOPHY ── */
+#philosophy{padding:clamp(80px,12vh,140px) var(--g);background:var(--g100)}
+.philo-q{font-family:var(--font-d);font-size:clamp(18px,2.6vw,34px);font-weight:300;line-height:1.45;color:#fff;max-width:860px;margin:0 auto 48px;text-align:center}
+.philo-q em{font-style:italic;color:rgba(255,255,255,.5)}
+.philo-attr{font-family:var(--font-m);font-size:9px;letter-spacing:.22em;color:var(--text-muted);text-align:center;margin-bottom:72px;text-transform:uppercase}
+.philo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px}
+.ph-c{background:var(--g200);padding:40px 28px;transition:background .3s}
+.ph-c:hover{background:var(--g300)}
+.ph-nm{font-family:var(--font-m);font-size:9px;letter-spacing:.22em;color:rgba(255,255,255,.4);margin-bottom:14px;text-transform:uppercase}
+.ph-t{font-size:14px;color:var(--text-muted);line-height:1.8}
+@media(max-width:768px){.philo-grid{grid-template-columns:1fr}}
 
-.full-section{position:relative;height:55vh;overflow:hidden;z-index:1}
-.full-section img{width:100%;height:120%;object-fit:cover;filter:brightness(.45);margin-top:-10%}
-.full-ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-.full-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.3em;color:var(--blue2)}
-.full-text{font-family:var(--font-hero);font-size:clamp(44px,7vw,96px);letter-spacing:-.01em;text-align:center;color:#fff}
-.full-text em{font-family:var(--font-serif);font-style:italic;color:var(--blue2)}
+/* ── TESTIMONIALS ── */
+#testimonials{padding:clamp(80px,12vh,140px) var(--g);background:var(--black)}
+.t-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:56px}
+.t-c{background:var(--g200);padding:40px 28px;transition:background .3s}
+.t-c:hover{background:var(--g300)}
+.t-q{font-family:var(--font-d);font-size:16px;font-weight:300;font-style:italic;color:var(--text-dim);line-height:1.7;margin-bottom:28px}
+.t-sep{width:20px;height:1px;background:rgba(255,255,255,.3);margin-bottom:14px}
+.t-name{font-family:var(--font-m);font-size:9px;letter-spacing:.15em;color:#fff;text-transform:uppercase}
+.t-loc{font-size:12px;color:var(--text-muted);margin-top:4px}
+@media(max-width:768px){.t-grid{grid-template-columns:1fr}}
 
-#extra{background:var(--bg);padding:100px 5vw}
-.extra-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
-.ex-c{position:relative;overflow:hidden;aspect-ratio:4/5;display:block;text-decoration:none}
-.ex-img{width:100%;height:100%;object-fit:cover;transition:transform .6s,filter .4s;filter:brightness(.7)}
-.ex-c:hover .ex-img{transform:scale(1.05);filter:brightness(.9)}
-.ex-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%)}
-.ex-body{position:absolute;bottom:0;left:0;right:0;padding:28px}
-.ex-cat{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--blue2);margin-bottom:8px}
-.ex-title{font-family:var(--font-hero);font-size:22px;letter-spacing:.04em;color:#fff}
-.ex-sub{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px}
-.ex-c.wide{grid-column:1/-1;aspect-ratio:21/7}
-.extra-bottom{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:2px}
+/* ── CONTACT ── */
+#contact{padding:clamp(80px,12vh,140px) var(--g);background:var(--g100)}
+.con-wrap{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.con-title{font-family:var(--font-d);font-size:clamp(44px,7vw,100px);font-weight:300;line-height:.94;margin-bottom:28px}
+.con-title em{font-style:italic;color:rgba(255,255,255,.4)}
+.con-p{font-size:15px;color:var(--text-dim);line-height:1.9;margin-bottom:12px}
+.chs{display:flex;flex-direction:column;gap:1px;margin-top:36px}
+.ch{display:flex;align-items:center;gap:14px;background:var(--g200);padding:20px 22px;border-left:1px solid transparent;text-decoration:none;transition:background .3s,border-left-color .3s;min-height:44px}
+.ch:hover{background:var(--g300);border-left-color:#fff}
+.ch-lbl{font-family:var(--font-m);font-size:9px;letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase;width:80px}
+.ch-val{font-size:13px;color:var(--text-dim);transition:color .3s}
+.ch:hover .ch-val{color:#fff}
+.ch-arr{margin-left:auto;color:var(--text-muted);transition:color .3s,transform .3s;font-size:12px;font-family:var(--font-m)}
+.ch:hover .ch-arr{color:#fff;transform:translateX(4px)}
+.con-right-top{background:var(--g200);border-top:1px solid rgba(255,255,255,.25);padding:36px;margin-bottom:1px}
+.con-loc-lbl{font-family:var(--font-m);font-size:9px;letter-spacing:.25em;color:var(--text-muted);margin-bottom:10px;text-transform:uppercase}
+.con-loc-val{font-size:14px;color:var(--text-dim);line-height:1.8}
+.con-avail{background:var(--g200);padding:36px}
+.avail-row{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.avail-dot{width:7px;height:7px;border-radius:50%;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.5);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 8px rgba(255,255,255,.5)}50%{box-shadow:0 0 16px rgba(255,255,255,.8)}}
+.avail-txt{font-family:var(--font-m);font-size:10px;letter-spacing:.15em;color:rgba(255,255,255,.7);text-transform:uppercase}
+.avail-p{font-size:13px;color:var(--text-muted);line-height:1.75;margin-bottom:24px}
+@media(max-width:768px){.con-wrap{grid-template-columns:1fr;gap:40px}}
 
-#testimonials{background:var(--bg2);padding:100px 5vw}
-.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
-.testi-c{background:var(--bg3);padding:36px;border-top:1px solid var(--border);transition:border-color .3s,background .3s}
-.testi-c:hover{border-top-color:var(--blue2);background:var(--panel)}
-.testi-stars{color:var(--blue2);font-size:14px;margin-bottom:16px;letter-spacing:2px}
-.testi-text{font-family:var(--font-serif);font-size:17px;font-style:italic;font-weight:300;color:var(--white2);line-height:1.7;margin-bottom:24px}
-.testi-author{font-family:var(--font-mono);font-size:10px;letter-spacing:.15em;color:var(--muted)}
-.testi-author b{color:var(--grey);display:block;font-family:var(--font-body);font-size:13px;letter-spacing:0;margin-bottom:2px}
+/* ── FOOTER ── */
+footer{padding:36px var(--g);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;background:var(--black)}
+.foot-c{font-family:var(--font-m);font-size:9px;letter-spacing:.15em;color:var(--text-muted);text-transform:uppercase}
+.foot-links{display:flex;gap:20px}
+.foot-links a{font-family:var(--font-m);font-size:9px;letter-spacing:.15em;color:var(--text-muted);text-decoration:none;text-transform:uppercase;transition:color .3s}
+.foot-links a:hover{color:#fff}
 
-#contact{background:var(--bg);padding:100px 5vw}
-.contact-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:100px;align-items:start}
-.ct-title{font-family:var(--font-hero);font-size:clamp(52px,8vw,110px);line-height:.88;letter-spacing:-.01em;margin-bottom:36px}
-.ct-title em{font-family:var(--font-serif);font-style:italic;color:var(--blue2)}
-.ct-p{font-size:15px;color:var(--grey);line-height:1.9;margin-bottom:28px}
-.ct-channels{display:flex;flex-direction:column;gap:2px;margin-bottom:36px}
-.ct-ch{display:flex;align-items:center;gap:18px;padding:22px;background:var(--bg3);border:1px solid var(--border);text-decoration:none;transition:border-color .3s,background .3s}
-.ct-ch:hover{border-color:var(--blue2);background:var(--bg2)}
-.ch-ico{width:42px;height:42px;border-radius:50%;background:rgba(41,151,255,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.ch-lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:var(--muted);margin-bottom:3px}
-.ch-val{font-size:14px;color:var(--white);font-weight:500}
-.ct-map-img{width:100%;aspect-ratio:1/1;object-fit:cover;filter:grayscale(80%)brightness(.5);margin-top:20px;display:block}
-.loc-box{margin-top:12px;padding:20px;background:var(--bg3);border:1px solid var(--border)}
-.loc-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.2em;color:var(--muted);margin-bottom:8px}
-.loc-text{font-size:14px;color:var(--grey);line-height:1.8}
+/* ── GLOBAL MOBILE (≤480px) ── */
+@media(max-width:480px){
+  :root{--g:20px}
+  nav{padding:0 20px;height:56px}
+  .nav-logo{font-size:16px}
 
-footer{background:var(--bg2);border-top:1px solid var(--border);padding:40px 5vw;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;gap:20px}
-.foot-brand{font-family:var(--font-hero);font-size:24px;letter-spacing:.12em}
-.foot-brand span{color:var(--blue2)}
-.foot-nav{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
-.foot-nav a{font-size:13px;color:var(--grey2);text-decoration:none;transition:color .3s}
-.foot-nav a:hover{color:var(--white)}
-.foot-copy{font-size:12px;color:var(--muted);text-align:right;line-height:1.7}
-
-/* ═══════════════════════════
-   MOBILE  ≤ 768px
-═══════════════════════════ */
-@media(max-width:768px){
-  /* hide custom cursor on touch */
-  #cur,#cur-ring{display:none}
-  body{cursor:auto}
-
-  /* controls — smaller & lower opacity */
-  #controls{bottom:12px;right:12px}
-  .ctrl-pill{font-size:9px;padding:6px 11px}
-
-  /* nav */
-  nav#nav{height:56px;padding:0 20px}
-  .nav-links,.nav-cta{display:none}
-
-  /* hero */
-  #hero{padding:90px 20px 100px;min-height:100svh}
-  .hero-label{font-size:9px;letter-spacing:.2em;margin-bottom:20px}
-  .hero-h1{font-size:clamp(68px,18vw,110px)}
-  .hero-h1 .ital{font-size:clamp(54px,14vw,88px)}
-  .hero-sub{font-size:15px;margin-top:20px;max-width:100%}
-  .hero-badges{gap:8px;margin-top:20px}
-  .hero-badge{font-size:11px;padding:5px 12px}
-  .hero-cta-row{flex-direction:column;gap:12px;margin-top:28px}
-  .btn-blue,.btn-ghost{width:100%;justify-content:center;padding:16px 24px;font-size:15px}
-  .hero-meta{position:static;text-align:left;margin-top:32px;opacity:1;animation:none}
-  .hero-meta-item{font-size:9px;margin-bottom:6px}
-  .scroll-cue{left:20px;bottom:28px}
-
-  /* marquee */
-  .m-item{font-size:12px}
-
-  /* sections padding */
-  #about,#skills,#works,#extra,#education,#process,#hestore,#philosophy,#testimonials,#contact{
-    padding:64px 20px
-  }
-
-  /* about */
-  .about-intro-text{font-size:clamp(22px,6vw,32px);margin-bottom:36px}
-  .about-cols{grid-template-columns:1fr;gap:40px}
-  .about-body-text{font-size:15px}
-  .about-quote p{font-size:18px}
-  .detail-table td{font-size:13px}
-  .detail-table td:first-child{width:100px;font-size:9px}
-
-  /* stats — single col on mobile */
+  /* stats */
   .stats-strip{grid-template-columns:1fr}
-  .stat-cell{padding:28px 20px;border-right:none;border-bottom:1px solid var(--border)}
-  .stat-cell:last-child{border-bottom:none}
-  .stat-n{font-size:44px}
-  .stat-l{font-size:9px;letter-spacing:.12em}
-
-  /* photo strip — 2 cols */
-  .photo-strip{grid-template-columns:1fr 1fr}
-  .ps-item{aspect-ratio:1/1}
+  .st-cell{border-right:none;border-bottom:1px solid var(--border);padding:36px 0}
+  .st-cell:last-child{border-bottom:none}
 
   /* skills */
-  .skills-hero{gap:20px}
-  .big-h{font-size:clamp(48px,12vw,72px)}
-  .skills-sub-text{text-align:left;max-width:100%}
-  .skills-rows{margin-top:0}
-  .sk-row{grid-template-columns:40px 1fr;gap:14px;padding:20px 12px}
-  .sk-desc,.sk-pill{display:none}
-  .sk-name{font-size:clamp(18px,5vw,26px)}
+  .sk-row{grid-template-columns:30px 1fr;gap:10px;padding:18px 8px}
+  .sk-name{font-size:22px}
 
   /* works */
-  .works-top{gap:20px}
-  .works-note-txt{text-align:left;max-width:100%}
-  .works-grid{grid-template-columns:1fr;gap:2px}
-  .w-item{aspect-ratio:16/9}
-  .w-item.big{aspect-ratio:16/9}
-  .w-title{font-size:clamp(18px,5vw,28px)}
-  .w-body{padding:20px}
-  .w-desc{display:none}
-
-  /* extra */
-  .extra-grid{grid-template-columns:1fr}
-  .ex-c.wide{aspect-ratio:16/9}
-  .extra-bottom{grid-template-columns:1fr}
-  .ex-c{aspect-ratio:16/9}
-  .ex-title{font-size:18px}
+  .w-item a{grid-template-columns:30px 1fr 24px;gap:10px;padding:20px 8px}
+  .wi-title{font-size:22px}
 
   /* education */
-  .edu-wrap{grid-template-columns:1fr;gap:40px}
-  .edu-img-stack{height:220px}
-  .ei1{width:60%;height:70%}
-  .ei2{width:55%;height:60%}
-  .ei3{width:38%;height:34%}
-  .edu-school{font-size:clamp(16px,5vw,22px)}
-  .edu-intro-p{font-size:14px}
+  .edu-imgs{height:240px}
+  .ei1{width:72%;height:65%}
+  .ei2{width:60%;height:58%}
+  .ei3{width:36%;height:26%;top:42%}
 
-  /* process */
-  .process-top-grid{grid-template-columns:1fr;gap:32px;margin-bottom:40px}
-  .steps-grid{grid-template-columns:1fr 1fr;gap:2px}
-  .step-c{padding:28px 18px}
-  .step-n{font-size:36px}
-  .step-title{font-size:15px}
-  .step-text{font-size:12px}
+  /* steps */
+  .steps-grid{grid-template-columns:1fr}
+  .step-c{padding:28px 20px}
 
-  /* hestore */
-  .store-big-img{aspect-ratio:16/9;margin-bottom:40px}
-  .store-layout{grid-template-columns:1fr;gap:40px}
-  .store-h{font-size:clamp(30px,8vw,48px)}
-  .store-p{font-size:14px}
-  .store-cta-block{padding:32px 20px;flex-direction:column;align-items:flex-start}
-  .store-cta-block h4{font-size:clamp(22px,6vw,32px)}
-  .store-cta-block .btn-blue{width:100%;justify-content:center}
-  .svc-c{padding:24px 16px}
+  /* store */
+  .hs-cta{padding:28px 20px}
 
-  /* philosophy */
-  .philo-q{font-size:clamp(18px,5vw,26px)}
-  .philo-attr{font-size:9px;margin-bottom:48px}
-  .philo-grid{grid-template-columns:1fr;gap:2px}
-  .philo-c{padding:28px 20px}
-
-  /* full section */
-  .full-section{height:45vh}
-  .full-text{font-size:clamp(32px,9vw,56px)}
+  /* philo */
+  .philo-grid{grid-template-columns:1fr}
 
   /* testimonials */
-  .testi-grid{grid-template-columns:1fr;gap:2px}
-  .testi-text{font-size:15px}
+  .t-grid{grid-template-columns:1fr}
 
   /* contact */
-  .contact-grid{grid-template-columns:1fr;gap:48px}
-  .ct-title{font-size:clamp(48px,12vw,80px)}
-  .ct-p{font-size:14px}
-  .ct-ch{padding:16px}
-  .ch-val{font-size:13px}
-  .ct-map-img{aspect-ratio:16/9}
-
-  /* footer */
-  footer{grid-template-columns:1fr;text-align:center;padding:32px 20px;gap:16px}
-  .foot-copy{text-align:center}
-  .foot-nav{gap:16px}
+  .con-wrap{grid-template-columns:1fr;gap:32px}
+  .con-title{font-size:clamp(40px,14vw,68px)}
 }
 
-/* ═══════════════════════════
-   TABLET  769–1024px
-═══════════════════════════ */
-@media(min-width:769px) and (max-width:1024px){
-  #about,#skills,#works,#extra,#education,#process,#hestore,#philosophy,#testimonials,#contact{
-    padding:80px 5vw
-  }
-  .about-cols{gap:40px}
-  .edu-wrap{gap:40px}
-  .edu-img-stack{height:380px}
-  .contact-grid{gap:48px}
-  .steps-grid{grid-template-columns:1fr 1fr;gap:2px}
-  .testi-grid{grid-template-columns:1fr 1fr;gap:2px}
-  .sk-row{grid-template-columns:60px 1fr auto;gap:20px}
-  .sk-desc{display:none}
-  .philo-grid{grid-template-columns:1fr 1fr;gap:2px}
+/* ── TABLET (481–768px) ── */
+@media(min-width:481px) and (max-width:768px){
+  .stats-strip{grid-template-columns:1fr 1fr}
+  .st-cell:nth-child(2){border-right:none}
+  .st-cell:nth-child(3){grid-column:1/-1;border-top:1px solid var(--border)}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .t-grid{grid-template-columns:1fr}
+  .philo-grid{grid-template-columns:1fr 1fr}
 }
 
-/* also keep the 900px breakpoint for grid collapses */
-@media(max-width:900px){
-  .works-grid,.extra-grid,.extra-bottom,.store-layout,
-  .process-top-grid,.contact-grid,.edu-wrap,.about-cols{
-    grid-template-columns:1fr
-  }
-  footer{grid-template-columns:1fr;text-align:center}
-  .foot-copy{text-align:center}
-}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
 
-<div id="loader">
-  <div class="ld-logo">HE ✦ PORTO</div>
-  <div class="ld-bar"><div class="ld-fill" id="ld-fill"></div></div>
-  <div class="ld-pct" id="ld-pct">000</div>
-</div>
-<div id="cur"></div>
-<div id="cur-ring"></div>
-<div id="prog"></div>
-<canvas id="canvas3d"></canvas>
+<!-- CURSOR -->
+<div id="cur"></div><div id="cur-dot"></div>
 
-<nav id="nav">
-  <a href="#hero" class="nav-logo">HE<span>✦</span>PORTO</a>
-  <ul class="nav-links">
-    <li><a href="#about"   data-key="nav_about">About</a></li>
-    <li><a href="#skills"  data-key="nav_skills">Skills</a></li>
-    <li><a href="#works"   data-key="nav_works">Works</a></li>
-    <li><a href="#hestore" data-key="nav_store">HE Store</a></li>
-    <li><a href="#contact" data-key="nav_contact">Contact</a></li>
-  </ul>
-  <a href="https://wa.me/6281346807918" target="_blank" class="nav-cta" data-key="nav_cta">Contact ↗</a>
+<!-- LOADER -->
+<div id="loader">
+  <div class="ld-txt">Zaenur Royhan Helmi</div>
+  <div class="ld-bar"><div class="ld-f" id="ldf"></div></div>
+  <div class="ld-n" id="ldn">000</div>
+</div>
+
+<!-- VERTICAL PROGRESS -->
+<div id="prog-v"><div id="prog-fill"></div><span id="prog-pct"></span></div>
+
+<!-- CHAPTER DOTS -->
+<nav id="chapters" aria-label="Section navigation">
+  <button class="ch-dot active" data-target="hero" title="Hero" aria-label="Go to Hero"></button>
+  <button class="ch-dot" data-target="about" title="About" aria-label="Go to About"></button>
+  <button class="ch-dot" data-target="skills" title="Skills" aria-label="Go to Skills"></button>
+  <button class="ch-dot" data-target="works" title="Works" aria-label="Go to Works"></button>
+  <button class="ch-dot" data-target="education" title="Education" aria-label="Go to Education"></button>
+  <button class="ch-dot" data-target="hestore" title="HE Store" aria-label="Go to HE Store"></button>
+  <button class="ch-dot" data-target="contact" title="Contact" aria-label="Go to Contact"></button>
 </nav>
 
-<div id="controls">
-  <div class="ctrl-group">
-    <span class="ctrl-lbl" id="lbl-theme">THEME</span>
-    <div class="ctrl-pills">
-      <span class="ctrl-pill"        id="btn-light" onclick="setTheme('light')">LIGHT</span>
-      <span class="ctrl-pill active" id="btn-dark"  onclick="setTheme('dark')">DARK</span>
-    </div>
+<!-- NAV -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">Z · R · H</a>
+  <div class="nav-r">
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#works">Works</a></li>
+      <li><a href="#hestore">HE Store</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="mbtn" id="mbtn" aria-label="Open menu" aria-expanded="false">Menu</button>
   </div>
-  <div class="ctrl-group">
-    <span class="ctrl-lbl" id="lbl-lang">LANGUAGE</span>
-    <div class="ctrl-pills">
-      <span class="ctrl-pill active" id="btn-en" onclick="setLang('en')">EN</span>
-      <span class="ctrl-pill"        id="btn-id" onclick="setLang('id')">ID</span>
-    </div>
-  </div>
+</nav>
+
+<!-- OVERLAY MENU -->
+<div id="menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+  <button class="mclose" id="mclose" aria-label="Close menu">✕ Close</button>
+  <a class="mi" href="#about" onclick="mClose()">About</a>
+  <a class="mi" href="#skills" onclick="mClose()">Skills</a>
+  <a class="mi" href="#works" onclick="mClose()">Works</a>
+  <a class="mi" href="#education" onclick="mClose()">Education</a>
+  <a class="mi" href="#hestore" onclick="mClose()">HE Store</a>
+  <a class="mi" href="#contact" onclick="mClose()">Contact</a>
 </div>
 
+<!-- HERO -->
 <section id="hero">
-  <div class="hero-label" data-key="hero_label">✦ Portfolio &amp; Company Information — 2025</div>
-  <h1 class="hero-h1">ZAENUR<br><span class="ital">Royhan</span>HELMI</h1>
-  <p class="hero-sub" data-key="hero_sub">Web Developer · Template Designer · Founder of HE Store — crafting elegant and meaningful digital experiences from Southeast Sulawesi.</p>
-  <div class="hero-badges">
-    <span class="hero-badge">HTML / CSS / JS</span>
-    <span class="hero-badge">Template Design</span>
-    <span class="hero-badge">HE Store</span>
-    <span class="hero-badge">Premium Apps</span>
+  <!-- Parallax Firewatch layers (monochrome) -->
+  <div id="parallax" aria-hidden="true">
+    <!-- Layer 1 – far mountains -->
+    <div class="p-layer" data-speed="0.04" style="bottom:0">
+      <svg viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,260 L0,180 Q120,60 240,130 Q360,200 480,90 Q600,20 720,110 Q840,190 960,80 Q1080,10 1200,120 Q1320,210 1440,140 L1440,260 Z" fill="#0d0d0d"/>
+      </svg>
+    </div>
+    <!-- Layer 2 – mid hills -->
+    <div class="p-layer" data-speed="0.1" style="bottom:0">
+      <svg viewBox="0 0 1440 300" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,300 L0,230 Q180,120 360,190 Q540,255 720,160 Q900,80 1080,210 Q1260,300 1440,230 L1440,300 Z" fill="#0a0a0a"/>
+      </svg>
+    </div>
+    <!-- Layer 3 – treeline far -->
+    <div class="p-layer" data-speed="0.18" style="bottom:0">
+      <svg viewBox="0 0 1440 340" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,340 L0,280 L16,260 L32,278 L48,248 L64,268 L80,240 L96,258 L112,230 L128,252 L144,228 L160,250 L176,220 L192,245 L220,260 L240,235 L260,255 L280,225 L300,248 L320,218 L340,242 L360,258 L380,232 L400,255 L420,228 L440,250 L460,225 L480,248 L500,222 L520,244 L540,218 L560,240 L580,258 L600,230 L620,254 L640,228 L660,250 L680,224 L700,246 L720,220 L740,244 L760,218 L780,242 L800,260 L820,234 L840,256 L860,230 L880,252 L900,226 L920,248 L940,222 L960,244 L980,262 L1000,234 L1020,256 L1040,228 L1060,252 L1080,224 L1100,248 L1120,222 L1140,246 L1160,264 L1180,236 L1200,260 L1220,232 L1240,256 L1260,228 L1280,250 L1300,224 L1320,248 L1340,268 L1360,242 L1380,265 L1400,246 L1420,268 L1440,255 L1440,340 Z" fill="#080808"/>
+      </svg>
+    </div>
+    <!-- Layer 4 – foreground -->
+    <div class="p-layer" data-speed="0.3" style="bottom:0">
+      <svg viewBox="0 0 1440 400" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,400 L0,340 L10,320 L22,340 L34,310 L46,332 L58,300 L70,325 L82,295 L94,318 L106,290 L118,312 L130,284 L142,308 L160,322 L180,295 L200,318 L220,290 L240,312 L260,285 L280,308 L300,325 L320,295 L340,318 L360,288 L380,312 L400,282 L420,308 L440,278 L460,305 L480,275 L500,302 L520,328 L540,298 L560,322 L580,292 L600,316 L620,286 L640,310 L660,280 L680,305 L700,325 L720,294 L740,318 L760,288 L780,312 L800,280 L820,308 L840,330 L860,296 L880,320 L900,290 L920,314 L940,284 L960,308 L980,328 L1000,295 L1020,320 L1040,288 L1060,314 L1080,282 L1100,308 L1120,278 L1140,305 L1160,325 L1180,292 L1200,318 L1220,286 L1240,312 L1260,282 L1280,308 L1300,278 L1320,305 L1340,325 L1360,295 L1380,320 L1400,305 L1420,328 L1440,310 L1440,400 Z" fill="#050505"/>
+      </svg>
+    </div>
   </div>
-  <div class="hero-cta-row">
-    <a href="#works"   class="btn-blue"  data-key="btn_view">View Works ↓</a>
-    <a href="#contact" class="btn-ghost" data-key="btn_contact">Contact Me →</a>
+
+  <div class="hero-eyebrow">Frontend Developer — Bombana, Sultra — Available ●</div>
+  <div id="scattered-name" aria-label="Zaenur Royhan Helmi"></div>
+
+  <div id="hero-sub-row">
+    <p class="hero-sub">A young developer with a great passion for building beautiful, functional, and memorable web experiences — from Sulawesi to the world.</p>
+    <div class="hero-meta">
+      <div class="hm-row">Location <span>— Bombana, Sultra</span></div>
+      <div class="hm-row">Focus <span>— Frontend Dev</span></div>
+      <div class="hm-row">Status <span>— Available ●</span></div>
+      <div class="hero-ctas">
+        <a href="#works" class="btn-w magnetic">View Works →</a>
+        <a href="https://wa.me/6281346807918" target="_blank" rel="noopener" class="btn-o magnetic">WhatsApp ↗</a>
+      </div>
+    </div>
   </div>
-  <div class="hero-meta">
-    <div class="hero-meta-item" id="meta-loc">LOCATION <span>— BOMBANA, SULTRA</span></div>
-    <div class="hero-meta-item" id="meta-focus">FOCUS <span>— FRONTEND DEV</span></div>
-    <div class="hero-meta-item" id="meta-status">STATUS <span>— AVAILABLE ●</span></div>
-  </div>
-  <div class="scroll-cue"><div class="scroll-line"></div><span class="scroll-lbl" data-key="scroll_lbl">SCROLL TO EXPLORE</span></div>
+  <div class="scroll-cue"><div class="sc-line"></div><span class="sc-lbl">Scroll to explore</span></div>
 </section>
 
-<div class="marquee-belt">
-  <div class="m-track">
-    <span class="m-item" data-mq="mq1">WEB DEVELOPER&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq2">HTML / CSS / JS&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq3">TEMPLATE DESIGN&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq4">HE STORE&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq5">PREMIUM APPS&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq6">SOUTHEAST SULAWESI&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq1">WEB DEVELOPER&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq2">HTML / CSS / JS&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq3">TEMPLATE DESIGN&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq4">HE STORE&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq5">PREMIUM APPS&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
-    <span class="m-item" data-mq="mq6">SOUTHEAST SULAWESI&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;</span>
+<!-- MARQUEE -->
+<div class="mqbelt" aria-hidden="true">
+  <div class="mq-track">
+    <span class="mq-item">Web Developer <b>·</b></span>
+    <span class="mq-item">HTML / CSS / JS <b>·</b></span>
+    <span class="mq-item">Template Design <b>·</b></span>
+    <span class="mq-item">HE Store <b>·</b></span>
+    <span class="mq-item">Premium Apps <b>·</b></span>
+    <span class="mq-item">Southeast Sulawesi <b>·</b></span>
+    <span class="mq-item">Web Developer <b>·</b></span>
+    <span class="mq-item">HTML / CSS / JS <b>·</b></span>
+    <span class="mq-item">Template Design <b>·</b></span>
+    <span class="mq-item">HE Store <b>·</b></span>
+    <span class="mq-item">Premium Apps <b>·</b></span>
+    <span class="mq-item">Southeast Sulawesi <b>·</b></span>
   </div>
 </div>
 
+<!-- ABOUT -->
 <section id="about">
-  <div class="sec-chip rev" data-key="chip_about">ABOUT ME</div>
-  <p class="about-intro-text rev" data-key="about_intro">A young developer with <em>great passion</em> for building beautiful, functional, and memorable web experiences.</p>
+  <div class="sec-lbl" data-r>About Me</div>
+  <p class="about-intro" data-r>A young developer with <em>great passion</em> for building beautiful, functional, and memorable web experiences.</p>
   <div class="about-cols">
-    <div class="rev-l">
-      <p class="about-body-text" data-key="about_p1">Zaenur Royhan Helmi was born and raised in Mulaeno Village, Bombana Regency, Southeast Sulawesi. From a young age, he has shown a strong interest in technology and digital design.</p>
-      <p class="about-body-text" data-key="about_p2">With an educational background in a disciplined Islamic boarding school environment, Zaenur developed self-taught web programming skills — proving that geographical limitations are not barriers to achieving world-class expertise.</p>
-      <p class="about-body-text" data-key="about_p3">He is currently focused on building digital works through his personal brand, <strong style="color:var(--white)">HE Store</strong>, while continuously honing his frontend design and development skills.</p>
-      <p class="about-body-text" data-key="about_p4">He believes that every website is not just a collection of code — but a <em style="color:var(--blue2)">story told visually</em>.</p>
-      <div class="tag-cloud">
+    <div data-rl>
+      <p class="ap">Zaenur Royhan Helmi was born and raised in Mulaeno Village, Bombana Regency, Southeast Sulawesi. From a young age, he has shown a strong interest in technology and digital design.</p>
+      <p class="ap">With an educational background in a disciplined Islamic boarding school environment, Zaenur developed self-taught web programming skills — proving that geographical limitations are not barriers to achieving world-class expertise.</p>
+      <p class="ap">He is currently focused on building digital works through his personal brand, <strong style="color:#fff">HE Store</strong>, while continuously honing his frontend design and development skills.</p>
+      <p class="ap">He believes that every website is not just a collection of code — but a <em style="color:rgba(255,255,255,.55)">story told visually</em>.</p>
+      <div class="tc">
         <span class="chip">HTML5</span><span class="chip">CSS3</span><span class="chip">JavaScript</span>
-        <span class="chip">Responsive Design</span><span class="chip">CSS Animation</span>
+        <span class="chip">Responsive</span><span class="chip">Animation</span>
         <span class="chip">UI Design</span><span class="chip">Template Dev</span><span class="chip">Three.js</span>
       </div>
     </div>
-    <div class="rev-r">
-      <div class="about-quote"><p data-key="about_quote">"I do not just build websites — I build experiences that make people pause and say: this is different."</p></div>
-      <table class="detail-table">
-        <tr><td data-key="td_name">Full Name</td><td>Zaenur Royhan Helmi</td></tr>
-        <tr><td data-key="td_born">Date of Birth</td><td data-key="td_born_val">Monday, June 18, 2007</td></tr>
-        <tr><td data-key="td_address">Address</td><td data-key="td_address_val">Mulaeno Village, Poleang Tengah,<br>Bombana Regency, Southeast Sulawesi</td></tr>
-        <tr><td data-key="td_wa">WhatsApp</td><td><a href="https://wa.me/6281346807918" target="_blank">081346807918</a></td></tr>
-        <tr><td data-key="td_email">Email</td><td><a href="mailto:zaenurroyhanh@gmail.com">zaenurroyhanh@gmail.com</a></td></tr>
-        <tr><td data-key="td_tiktok">TikTok</td><td><a href="https://tiktok.com/@haneleff" target="_blank">@haneleff</a></td></tr>
+    <div data-rr>
+      <div class="aq"><p>"I do not just build websites — I build experiences that make people pause and say: this is different."</p></div>
+      <table class="dtab">
+        <tr><td>Full Name</td><td>Zaenur Royhan Helmi</td></tr>
+        <tr><td>Born</td><td>Monday, June 18, 2007</td></tr>
+        <tr><td>Address</td><td>Mulaeno Village, Poleang Tengah,<br>Bombana Regency, Southeast Sulawesi</td></tr>
+        <tr><td>WhatsApp</td><td><a href="https://wa.me/6281346807918" target="_blank" rel="noopener">081346807918</a></td></tr>
+        <tr><td>Email</td><td><a href="mailto:zaenurroyhanh@gmail.com">zaenurroyhanh@gmail.com</a></td></tr>
+        <tr><td>TikTok</td><td><a href="https://tiktok.com/@haneleff" target="_blank" rel="noopener">@haneleff</a></td></tr>
       </table>
     </div>
   </div>
 </section>
 
-<div class="stats-strip rev">
-  <div class="stat-cell"><div class="stat-n">5+</div><div class="stat-l" data-key="stat1">COMPLETED PROJECTS</div></div>
-  <div class="stat-cell"><div class="stat-n">3</div><div class="stat-l" data-key="stat2">ACTIVE SERVICES</div></div>
-  <div class="stat-cell"><div class="stat-n">∞</div><div class="stat-l" data-key="stat4">LEARNING SPIRIT</div></div>
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="st-cell" data-r><div class="st-n">5+</div><div class="st-l">Completed Projects</div></div>
+  <div class="st-cell" data-r style="transition-delay:.1s"><div class="st-n">3</div><div class="st-l">Active Services</div></div>
+  <div class="st-cell" data-r style="transition-delay:.2s"><div class="st-n">∞</div><div class="st-l">Learning Spirit</div></div>
 </div>
 
-<div class="photo-strip">
-  <div class="ps-item rev"><img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80" alt="" loading="lazy"/><div class="ps-cap">WEB DEV</div></div>
-  <div class="ps-item rev" style="transition-delay:.1s"><img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80" alt="" loading="lazy"/><div class="ps-cap">CODE</div></div>
-  <div class="ps-item rev" style="transition-delay:.2s"><img src="https://images.unsplash.com/photo-1545670723-196ed0954986?w=600&q=80" alt="" loading="lazy"/><div class="ps-cap">DESIGN</div></div>
-  <div class="ps-item rev" style="transition-delay:.3s"><img src="https://images.unsplash.com/photo-1558655146-d09347e92766?w=600&q=80" alt="" loading="lazy"/><div class="ps-cap">CREATIVE</div></div>
-</div>
-
+<!-- SKILLS -->
 <section id="skills">
-  <div class="skills-hero">
-    <div class="rev-l">
-      <div class="sec-chip" data-key="chip_skills">CORE SKILLS</div>
-      <h2 class="big-h" data-key="skills_h">SKILL<br><em>Stack</em></h2>
+  <div class="sk-top">
+    <div data-rl>
+      <div class="sec-lbl">Core Skills</div>
+      <h2 class="big-h">SKILL<br><em>Stack</em></h2>
     </div>
-    <p class="skills-sub-text rev-r" data-key="skills_sub">Specializing in modern frontend technologies to build stunning, responsive, and high-performance interfaces.</p>
+    <p class="sk-sub" data-rr>Specializing in modern frontend technologies to build stunning, responsive, and high-performance interfaces.</p>
   </div>
-  <div class="skills-rows">
-    <div class="sk-row rev"><span class="sk-idx">01</span><span class="sk-name">HTML / CSS</span><span class="sk-desc" data-key="sk1_d">Semantic structure, responsive layouts, CSS animations, pixel-perfect styling.</span><span class="sk-pill">EXPERT</span></div>
-    <div class="sk-row rev" style="transition-delay:.07s"><span class="sk-idx">02</span><span class="sk-name">JAVASCRIPT</span><span class="sk-desc" data-key="sk2_d">DOM manipulation, event handling, fetch API, smooth UI logic.</span><span class="sk-pill">ADVANCED</span></div>
-    <div class="sk-row rev" style="transition-delay:.14s"><span class="sk-idx">03</span><span class="sk-name">TEMPLATE DESIGN</span><span class="sk-desc" data-key="sk3_d">Ready-to-use website templates with modern aesthetics and modular components.</span><span class="sk-pill">EXPERT</span></div>
-    <div class="sk-row rev" style="transition-delay:.21s"><span class="sk-idx">04</span><span class="sk-name">RESPONSIVE UI</span><span class="sk-desc" data-key="sk4_d">Adaptive layouts from mobile 320px to ultrawide 2560px.</span><span class="sk-pill">ADVANCED</span></div>
-    <div class="sk-row rev" style="transition-delay:.28s"><span class="sk-idx">05</span><span class="sk-name">CSS ANIMATION</span><span class="sk-desc" data-key="sk5_d">Micro-interactions, scroll-triggered animations, Three.js 3D visuals.</span><span class="sk-pill">ADVANCED</span></div>
-    <div class="sk-row rev" style="transition-delay:.35s"><span class="sk-idx">06</span><span class="sk-name">UI / UX SENSE</span><span class="sk-desc" data-key="sk6_d">Visual hierarchy, whitespace, typography, color contrast, intuitive user flow.</span><span class="sk-pill">GROWING</span></div>
+  <div class="sk-rows">
+    <div class="sk-row" data-r><span class="sk-i">01</span><span class="sk-name">HTML / CSS</span><span class="sk-desc">Semantic structure, responsive layouts, CSS animations, pixel-perfect styling.</span><span class="sk-lvl">Expert</span></div>
+    <div class="sk-row" data-r style="transition-delay:.07s"><span class="sk-i">02</span><span class="sk-name">JavaScript</span><span class="sk-desc">DOM manipulation, event handling, fetch API, smooth UI logic.</span><span class="sk-lvl">Advanced</span></div>
+    <div class="sk-row" data-r style="transition-delay:.14s"><span class="sk-i">03</span><span class="sk-name">Template Design</span><span class="sk-desc">Ready-to-use website templates with modern aesthetics and modular components.</span><span class="sk-lvl">Expert</span></div>
+    <div class="sk-row" data-r style="transition-delay:.21s"><span class="sk-i">04</span><span class="sk-name">Responsive UI</span><span class="sk-desc">Adaptive layouts from mobile 320px to ultrawide 2560px.</span><span class="sk-lvl">Advanced</span></div>
+    <div class="sk-row" data-r style="transition-delay:.28s"><span class="sk-i">05</span><span class="sk-name">CSS Animation</span><span class="sk-desc">Micro-interactions, scroll-triggered animations, Three.js 3D visuals.</span><span class="sk-lvl">Advanced</span></div>
+    <div class="sk-row" data-r style="transition-delay:.35s"><span class="sk-i">06</span><span class="sk-name">UI / UX Sense</span><span class="sk-desc">Visual hierarchy, whitespace, typography, color contrast, intuitive user flow.</span><span class="sk-lvl">Growing</span></div>
   </div>
 </section>
 
-<div class="full-section">
-  <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1600&q=80" alt="" loading="lazy"/>
-  <div class="full-ov">
-    <div class="full-label" id="full1-label">✦ PHILOSOPHY</div>
-    <div class="full-text"  id="full1-text">DESIGN IS<br><em>thinking</em><br>MADE VISUAL</div>
-  </div>
+<!-- SWAY DIVIDER -->
+<div class="sway-div" aria-hidden="true">
+  <div class="sway-txt">Design is thinking made visual · Design is thinking made visual · Design is thinking made visual ·&nbsp;</div>
 </div>
 
+<!-- WORKS — LIST + FLOATING PREVIEW -->
 <section id="works">
-  <div class="works-top">
-    <div class="rev-l">
-      <div class="sec-chip" data-key="chip_works">SELECTED WORKS</div>
-      <h2 class="big-h" data-key="works_h">FEATURED<br><em>Projects</em></h2>
+  <div id="wpreview" aria-hidden="true"><img id="wpreview-img" src="" alt=""/></div>
+  <div class="w-top">
+    <div data-rl>
+      <div class="sec-lbl">Selected Works</div>
+      <h2 class="big-h">FEATURED<br><em>Projects</em></h2>
     </div>
-    <p class="works-note-txt rev-r" data-key="works_note">Five websites built with pure HTML, CSS, and JavaScript — lightweight, fast, backend-free.</p>
+    <p class="w-note" data-rr>Five websites built with pure HTML, CSS, and JavaScript — lightweight, fast, backend-free.</p>
   </div>
-  <div class="works-grid">
-    <a class="w-item big rev" href="https://hecreatorw.github.io/ZenAi.com/" target="_blank">
-      <img class="w-img" src="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=1400&q=80" alt=""/>
-      <div class="w-ov"></div><div class="w-num">01/05</div>
-      <div class="w-body"><div class="w-tags"><span class="w-tag">AI PLATFORM</span><span class="w-tag">FEATURED</span></div><div class="w-title">ZEN AI</div><div class="w-desc" data-key="w1_desc">Futuristic AI interface — interactive AI platform with a stunning design</div><span class="w-arrow" data-key="w_open">OPEN WEBSITE ↗</span></div>
-    </a>
-    <a class="w-item rev" href="https://hecreatorw.github.io/hanance.com/" target="_blank">
-      <img class="w-img" src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80" alt=""/>
-      <div class="w-ov"></div><div class="w-num">02/05</div>
-      <div class="w-body"><div class="w-tags"><span class="w-tag">FINANCE APP</span></div><div class="w-title">HANANCE</div><div class="w-desc" data-key="w2_desc">Lightweight and intuitive personal daily financial notes app</div><span class="w-arrow" data-key="w_open">OPEN WEBSITE ↗</span></div>
-    </a>
-    <a class="w-item rev" style="transition-delay:.1s" href="https://hecreatorw.github.io/APstore/" target="_blank">
-      <img class="w-img" src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80" alt=""/>
-      <div class="w-ov"></div><div class="w-num">03/05</div>
-      <div class="w-body"><div class="w-tags"><span class="w-tag">BUSINESS PROFILE</span></div><div class="w-title">AP STORE</div><div class="w-desc" data-key="w3_desc">Premium business profile with modern design and integrated order system</div><span class="w-arrow" data-key="w_open">OPEN WEBSITE ↗</span></div>
-    </a>
-    <a class="w-item rev" href="https://hecreatorw.github.io/pencatatanHEstore.com/" target="_blank">
-      <img class="w-img" src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80" alt=""/>
-      <div class="w-ov"></div><div class="w-num">04/05</div>
-      <div class="w-body"><div class="w-tags"><span class="w-tag">RECORDS SYSTEM</span></div><div class="w-title">HE STORE RECORDS</div><div class="w-desc" data-key="w4_desc">Structured and efficient HE Store operational records system</div><span class="w-arrow" data-key="w_open">OPEN WEBSITE ↗</span></div>
-    </a>
-    <a class="w-item rev" style="transition-delay:.1s" href="https://hecreatorw.github.io/aporderbook/" target="_blank">
-      <img class="w-img" src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800&q=80" alt=""/>
-      <div class="w-ov"></div><div class="w-num">05/05</div>
-      <div class="w-body"><div class="w-tags"><span class="w-tag">ORDER MANAGEMENT</span></div><div class="w-title">AP ORDER BOOK</div><div class="w-desc" data-key="w5_desc">AP Store order management — integrated and real-time order tracking</div><span class="w-arrow" data-key="w_open">OPEN WEBSITE ↗</span></div>
-    </a>
-  </div>
+  <ul class="w-list">
+    <li class="w-item" data-preview="https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80">
+      <a href="https://hecreatorw.github.io/ZenAi.com/" target="_blank" rel="noopener"><span class="wi-num">01</span><span class="wi-title">Zen AI</span><span class="wi-tags"><span class="wi-tag">AI Platform</span><span class="wi-tag">Featured</span></span><span class="wi-arr">→</span></a>
+    </li>
+    <li class="w-item" data-preview="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80">
+      <a href="https://hecreatorw.github.io/hanance.com/" target="_blank" rel="noopener"><span class="wi-num">02</span><span class="wi-title">Hanance</span><span class="wi-tags"><span class="wi-tag">Finance App</span></span><span class="wi-arr">→</span></a>
+    </li>
+    <li class="w-item" data-preview="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80">
+      <a href="https://hecreatorw.github.io/APstore/" target="_blank" rel="noopener"><span class="wi-num">03</span><span class="wi-title">AP Store</span><span class="wi-tags"><span class="wi-tag">Business Profile</span></span><span class="wi-arr">→</span></a>
+    </li>
+    <li class="w-item" data-preview="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80">
+      <a href="https://hecreatorw.github.io/pencatatanHEstore.com/" target="_blank" rel="noopener"><span class="wi-num">04</span><span class="wi-title">HE Store Records</span><span class="wi-tags"><span class="wi-tag">Records System</span></span><span class="wi-arr">→</span></a>
+    </li>
+    <li class="w-item" data-preview="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=600&q=80">
+      <a href="https://hecreatorw.github.io/aporderbook/" target="_blank" rel="noopener"><span class="wi-num">05</span><span class="wi-title">AP Order Book</span><span class="wi-tags"><span class="wi-tag">Order Management</span></span><span class="wi-arr">→</span></a>
+    </li>
+  </ul>
 </section>
 
-<section id="extra">
-  <div class="sec-chip rev" style="margin-bottom:48px" data-key="chip_extra">INSPIRATION &amp; VISION</div>
-  <div class="extra-grid rev">
-    <a class="ex-c wide" href="#works"><img class="ex-img" src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=1600&q=80" alt=""/><div class="ex-ov"></div><div class="ex-body"><div class="ex-cat" data-key="ex1_cat">DESIGN VISION</div><div class="ex-title" data-key="ex1_title">Building the Digital Future</div><div class="ex-sub" data-key="ex1_sub">Every project is a step toward innovation</div></div></a>
-  </div>
-  <div class="extra-bottom rev">
-    <a class="ex-c" href="#hestore"><img class="ex-img" src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=900&q=80" alt=""/><div class="ex-ov"></div><div class="ex-body"><div class="ex-cat" data-key="ex2_cat">WORKSPACE</div><div class="ex-title" data-key="ex2_title">Clean Code, Clear Mind</div><div class="ex-sub" data-key="ex2_sub">Productivity in simplicity</div></div></a>
-    <a class="ex-c" href="#contact"><img class="ex-img" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&q=80" alt=""/><div class="ex-ov"></div><div class="ex-body"><div class="ex-cat" data-key="ex3_cat">COLLABORATION</div><div class="ex-title" data-key="ex3_title">Big Ideas Start from Small Conversations</div><div class="ex-sub" data-key="ex3_sub">Let us bring your vision to life</div></div></a>
-  </div>
-</section>
-
+<!-- EDUCATION -->
 <section id="education">
-  <div class="sec-chip rev" data-key="chip_edu">EDUCATION HISTORY</div>
+  <div class="sec-lbl" data-r>Education History</div>
   <div class="edu-wrap">
-    <div class="rev-l">
-      <p class="edu-intro-p" data-key="edu_p1">A long journey from elementary school in the small village of Mulaeno to madrasah aliyah — a foundation that builds character, discipline, and an unquenchable curiosity.</p>
-      <p class="edu-intro-p" data-key="edu_p2">The values instilled at Baitul Arqom pesantren — perseverance, honesty, and a love of learning — become the compass in every line of code written.</p>
-      <div class="edu-timeline">
-        <div class="edu-item"><div class="edu-dot"></div><div><div class="edu-level" data-key="edu_l1">ELEMENTARY SCHOOL</div><div class="edu-school">SDN 1 MULAENO</div><div class="edu-loc" data-key="edu_loc1">Mulaeno Village, Poleang Tengah, Bombana Regency</div></div></div>
-        <div class="edu-item"><div class="edu-dot"></div><div><div class="edu-level" data-key="edu_l2">JUNIOR HIGH (ISLAMIC)</div><div class="edu-school">MTS BAITUL ARQOM</div><div class="edu-loc" data-key="edu_loc2">Polinggona, Kolaka Regency, Southeast Sulawesi</div></div></div>
-        <div class="edu-item"><div class="edu-dot"></div><div><div class="edu-level" data-key="edu_l3">SENIOR HIGH (ISLAMIC)</div><div class="edu-school">MA BAITUL ARQOM</div><div class="edu-loc" data-key="edu_loc3">Polinggona, Kolaka Regency, Southeast Sulawesi</div></div></div>
+    <div data-rl>
+      <p class="edu-p">A long journey from elementary school in the small village of Mulaeno to madrasah aliyah — a foundation that builds character, discipline, and an unquenchable curiosity.</p>
+      <p class="edu-p">The values instilled at Baitul Arqom pesantren — perseverance, honesty, and a love of learning — become the compass in every line of code written.</p>
+      <div class="edu-tl">
+        <div class="edu-item"><div class="edu-dot"></div><div><div class="edu-lv">Elementary School</div><div class="edu-school">SDN 1 Mulaeno</div><div class="edu-loc">Mulaeno Village, Poleang Tengah, Bombana Regency</div></div></div>
+        <div class="edu-item"><div class="edu-dot"></div><div><div class="edu-lv">Junior High (Islamic)</div><div class="edu-school">MTs Baitul Arqom</div><div class="edu-loc">Polinggona, Kolaka Regency, Southeast Sulawesi</div></div></div>
+        <div class="edu-item"><div class="edu-dot"></div><div><div class="edu-lv">Senior High (Islamic)</div><div class="edu-school">MA Baitul Arqom</div><div class="edu-loc">Polinggona, Kolaka Regency, Southeast Sulawesi</div></div></div>
       </div>
     </div>
-    <div class="edu-img-stack rev-r">
-      <img class="ei1" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=700&q=80" alt="" loading="lazy"/>
-      <img class="ei2" src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=700&q=80" alt="" loading="lazy"/>
-      <img class="ei3" src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=80" alt="" loading="lazy"/>
+    <div class="edu-imgs" data-rr>
+      <img class="ei ei1" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=700&q=80" alt="" loading="lazy"/>
+      <img class="ei ei2" src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=700&q=80" alt="" loading="lazy"/>
+      <img class="ei ei3" src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400&q=80" alt="" loading="lazy"/>
     </div>
   </div>
 </section>
 
+<!-- PROCESS -->
 <section id="process">
-  <div class="sec-chip rev" data-key="chip_process">WORKFLOW</div>
-  <div class="process-top-grid">
-    <div class="rev-l">
-      <h2 class="big-h" data-key="process_h">CREATIVE<br><em>Process</em></h2>
-      <p style="font-size:14px;color:var(--grey);margin-top:20px;line-height:1.8" data-key="process_sub">From the first idea to the final file, every stage is executed carefully and results-oriented.</p>
+  <div class="sec-lbl" data-r>Workflow</div>
+  <div class="proc-top">
+    <div data-rl>
+      <h2 class="big-h">CREATIVE<br><em>Process</em></h2>
+      <p style="font-size:14px;color:var(--text-dim);margin-top:20px;line-height:1.8">From the first idea to the final file, every stage is executed carefully and results-oriented.</p>
     </div>
-    <div class="rev-r"><img class="process-img" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=900&q=80" alt="" loading="lazy"/></div>
+    <div data-rr><img class="proc-img" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=900&q=80" alt="" loading="lazy"/></div>
   </div>
   <div class="steps-grid">
-    <div class="step-c rev"><div class="step-n">01</div><div class="step-title" data-key="step1_t">DISCOVERY</div><div class="step-text" data-key="step1_txt">Listening to and understanding client needs, business goals, and design references in depth.</div></div>
-    <div class="step-c rev" style="transition-delay:.1s"><div class="step-n">02</div><div class="step-title" data-key="step2_t">CONCEPT</div><div class="step-text" data-key="step2_txt">Designing wireframes, selecting color palettes, typography, and visual concepts for brand identity.</div></div>
-    <div class="step-c rev" style="transition-delay:.2s"><div class="step-n">03</div><div class="step-title" data-key="step3_t">BUILD</div><div class="step-text" data-key="step3_txt">Coding with clean, responsive HTML, CSS, JavaScript optimized for the best performance.</div></div>
-    <div class="step-c rev" style="transition-delay:.3s"><div class="step-n">04</div><div class="step-title" data-key="step4_t">DELIVER</div><div class="step-text" data-key="step4_txt">Thorough testing across devices, revisions until perfect, and delivery of deploy-ready files.</div></div>
+    <div class="step-c" data-r><div class="step-n">01</div><div class="step-t">Discovery</div><div class="step-p">Listening to and understanding client needs, business goals, and design references in depth.</div></div>
+    <div class="step-c" data-r style="transition-delay:.1s"><div class="step-n">02</div><div class="step-t">Concept</div><div class="step-p">Designing wireframes, selecting color palettes, typography, and visual concepts for brand identity.</div></div>
+    <div class="step-c" data-r style="transition-delay:.2s"><div class="step-n">03</div><div class="step-t">Build</div><div class="step-p">Coding with clean, responsive HTML, CSS, JavaScript optimized for the best performance.</div></div>
+    <div class="step-c" data-r style="transition-delay:.3s"><div class="step-n">04</div><div class="step-t">Deliver</div><div class="step-p">Thorough testing across devices, revisions until perfect, and delivery of deploy-ready files.</div></div>
   </div>
 </section>
 
-<div class="photo-strip">
-  <div class="ps-item rev"><img src="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=600&q=80" alt="" loading="lazy"/><div class="ps-cap">IDEATION</div></div>
-  <div class="ps-item rev" style="transition-delay:.1s"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=80" alt="" loading="lazy"/><div class="ps-cap">COLLABORATE</div></div>
-  <div class="ps-item rev" style="transition-delay:.2s"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&q=80" alt="" loading="lazy"/><div class="ps-cap">WORKSPACE</div></div>
-  <div class="ps-item rev" style="transition-delay:.3s"><img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=600&q=80" alt="" loading="lazy"/><div class="ps-cap">MOBILE FIRST</div></div>
-</div>
-
+<!-- HE STORE -->
 <section id="hestore">
-  <div class="sec-chip rev" data-key="chip_store">HE STORE</div>
-  <img class="store-big-img rev" src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600&q=80" alt="" loading="lazy"/>
-  <div class="store-layout">
-    <div class="rev-l">
-      <h3 class="store-h" data-key="store_h">Affordable Digital <em>Solutions</em><br>for Everyone</h3>
-      <p class="store-p" data-key="store_p1">HE Store is a digital brand born from the belief that premium technology should be accessible to everyone — not just large corporations with big budgets.</p>
-      <p class="store-p" data-key="store_p2">We provide professional website development services and premium app packages at very affordable prices, without compromising quality.</p>
-      <p class="store-p" data-key="store_p3">Every client — from small entrepreneurs to local communities — receives the same attention and dedication. Client satisfaction is everything.</p>
-      <div style="margin-top:32px;display:flex;gap:14px;flex-wrap:wrap">
-        <a href="https://wa.me/6281346807918" target="_blank" class="btn-blue"  data-key="store_btn1">Order Now ↗</a>
-        <a href="https://hecreatorw.github.io/APstore/" target="_blank" class="btn-ghost" data-key="store_btn2">View Profile →</a>
+  <div class="sec-lbl" data-r>HE Store</div>
+  <div class="hs-layout">
+    <div data-rl>
+      <h2 class="big-h hs-h">Affordable<br>Digital <em>Solutions</em><br>for All</h2>
+      <p class="hs-p">HE Store is a digital brand born from the belief that premium technology should be accessible to everyone.</p>
+      <p class="hs-p">Professional website creation and premium app packages at very affordable prices, without sacrificing quality.</p>
+      <p class="hs-p">Every client — from small business owners to local communities — receives the same attention and dedication.</p>
+      <div style="display:flex;gap:12px;margin-top:32px;flex-wrap:wrap">
+        <a href="https://wa.me/6281346807918" target="_blank" rel="noopener" class="btn-w magnetic">Order Now →</a>
+        <a href="https://hecreatorw.github.io/APstore/" target="_blank" rel="noopener" class="btn-o magnetic">View Profile ↗</a>
       </div>
     </div>
-    <div class="svc-list rev-r">
-      <div class="svc-c"><div class="svc-ico">🌐</div><div><div class="svc-nm" data-key="svc1_n">WEBSITE DEVELOPMENT</div><div class="svc-tx" data-key="svc1_t">Professional website development using HTML, CSS, and JavaScript. Business profiles, portfolios, landing pages, and lightweight systems.</div><span class="svc-tag" data-key="svc1_tag">REQUEST PRICE</span></div></div>
-      <div class="svc-c"><div class="svc-ico">👑</div><div><div class="svc-nm" data-key="svc2_n">PREMIUM APPS</div><div class="svc-tx" data-key="svc2_t">Access to Netflix, Spotify, and other digital services at prices far below the official rate. Fast, secure, and trusted.</div><span class="svc-tag" data-key="svc2_tag">SPECIAL PRICE</span></div></div>
-      <div class="svc-c"><div class="svc-ico">🎨</div><div><div class="svc-nm" data-key="svc3_n">DESIGN TEMPLATES</div><div class="svc-tx" data-key="svc3_t">Ready-to-use website templates with modern and professional design. Easy customization — just fill in content. Suitable for any business.</div><span class="svc-tag" data-key="svc3_tag">READY TO USE</span></div></div>
+    <div class="svc-list" data-rr>
+      <div class="svc-c">
+        <svg class="svc-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+        <div><div class="svc-nm">Website Creation</div><div class="svc-tx">Professional website creation using HTML, CSS, and JavaScript. Business profiles, portfolios, landing pages, and lightweight record systems.</div><span class="svc-tag">Request Price</span></div>
+      </div>
+      <div class="svc-c">
+        <svg class="svc-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <div><div class="svc-nm">Premium Apps</div><div class="svc-tx">Access Netflix, Spotify, and other digital services at prices far below the official price. Fast, secure, and trusted.</div><span class="svc-tag">Special Price</span></div>
+      </div>
+      <div class="svc-c">
+        <svg class="svc-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <div><div class="svc-nm">Design Templates</div><div class="svc-tx">Ready-to-use website templates with modern and professional design. Easy to customize. Suitable for any business.</div><span class="svc-tag">Ready to Use</span></div>
+      </div>
     </div>
   </div>
-  <div class="store-cta-block rev">
-    <div><h4 data-key="store_cta_h">Ready to start a <em>project together?</em></h4><p data-key="store_cta_p">Free consultation via WhatsApp. Tell me your needs and I will help bring it to life quickly.</p></div>
-    <a href="https://wa.me/6281346807918" target="_blank" class="btn-blue" style="flex-shrink:0" data-key="store_cta_btn">Chat WhatsApp ↗</a>
+  <div class="hs-cta" data-r>
+    <div>
+      <div class="hs-cta-h">Ready to start a project <em>together?</em></div>
+      <p>Free consultation via WhatsApp. Tell me your needs and I am ready to help make it happen.</p>
+    </div>
+    <a href="https://wa.me/6281346807918" target="_blank" rel="noopener" class="btn-w magnetic">Chat WhatsApp →</a>
   </div>
 </section>
 
+<!-- PHILOSOPHY -->
 <section id="philosophy">
-  <div class="sec-chip rev" style="display:inline-flex;margin:0 auto 28px" data-key="chip_philo">PHILOSOPHY</div>
-  <p class="philo-q rev" data-key="philo_q">"Every pixel must be <em>meaningful</em>. Every line of code must have <em>value</em>. Design is not decoration — it is <em>communication</em> that speaks without sound."</p>
-  <div class="philo-attr rev" data-key="philo_attr">— Zaenur Royhan Helmi</div>
-  <div class="philo-grid rev">
-    <div class="philo-c"><div class="philo-ico">⚡</div><div class="philo-nm" data-key="ph1_n">SIMPLICITY FIRST</div><div class="philo-tx" data-key="ph1_t">Simplicity executed perfectly is always more powerful than unnecessary complexity. Clean, focused, purposeful design.</div></div>
-    <div class="philo-c"><div class="philo-ico">🎯</div><div class="philo-nm" data-key="ph2_n">PURPOSE DRIVEN</div><div class="philo-tx" data-key="ph2_t">Every visual decision must have a reason. Aesthetics and function work together as one harmonious unit.</div></div>
-    <div class="philo-c"><div class="philo-ico">🌱</div><div class="philo-nm" data-key="ph3_n">ALWAYS GROWING</div><div class="philo-tx" data-key="ph3_t">The tech world moves very fast. Committed to continuously learning, adapting, and pushing to the next level every day.</div></div>
+  <div class="sec-lbl" data-r style="justify-content:center;margin-bottom:48px">Philosophy</div>
+  <p class="philo-q" data-r>"Every pixel must <em>mean something</em>. Every line of code must <em>have value</em>. Design is not decoration — it is <em>communication</em> that speaks without words."</p>
+  <p class="philo-attr" data-r>— Zaenur Royhan Helmi</p>
+  <div class="philo-grid">
+    <div class="ph-c" data-r><div class="ph-nm">Simplicity First</div><div class="ph-t">Simplicity executed perfectly is always stronger than excessive complexity. Clean design, focused, purposeful.</div></div>
+    <div class="ph-c" data-r style="transition-delay:.1s"><div class="ph-nm">Purpose Driven</div><div class="ph-t">Every visual decision must have a reason. Aesthetics and function work together as one harmonious whole.</div></div>
+    <div class="ph-c" data-r style="transition-delay:.2s"><div class="ph-nm">Always Growing</div><div class="ph-t">The world of technology moves very fast. Commitment to keep learning, adapting, and pushing to the next level.</div></div>
   </div>
 </section>
 
-<div class="full-section">
-  <img src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=1600&q=80" alt="" loading="lazy"/>
-  <div class="full-ov">
-    <div class="full-label" id="full2-label">✦ HE STORE — SOUTHEAST SULAWESI</div>
-    <div class="full-text"  id="full2-text">FROM <em>Sulawesi</em><br>TO THE WORLD</div>
-  </div>
-</div>
-
+<!-- TESTIMONIALS -->
 <section id="testimonials">
-  <div class="sec-chip rev" style="margin-bottom:60px" data-key="chip_testi">WHAT THEY SAY</div>
-  <div class="testi-grid">
-    <div class="testi-c rev"><div class="testi-stars">★ ★ ★ ★ ★</div><p class="testi-text" data-key="t1">"The result is outstanding! The website far exceeded my expectations. Modern design, fast loading, responsive on all devices."</p><div class="testi-author"><b data-key="t1_a">Ahmad Fauzi</b><span data-key="t1_l">ONLINE ENTREPRENEUR — KENDARI</span></div></div>
-    <div class="testi-c rev" style="transition-delay:.1s"><div class="testi-stars">★ ★ ★ ★ ★</div><p class="testi-text" data-key="t2">"Very satisfied with the template ordered. Ready to use immediately, looks very professional. Affordable price for this quality."</p><div class="testi-author"><b data-key="t2_a">Siti Rahmawati</b><span data-key="t2_l">F&amp;B BUSINESS OWNER — MAKASSAR</span></div></div>
-    <div class="testi-c rev" style="transition-delay:.2s"><div class="testi-stars">★ ★ ★ ★ ★</div><p class="testi-text" data-key="t3">"HE Store is the best! The premium Netflix subscription is super cheap and the process is lightning fast. 3 months, no issues."</p><div class="testi-author"><b data-key="t3_a">Rizky Pratama</b><span data-key="t3_l">STUDENT — BOMBANA</span></div></div>
+  <div class="sec-lbl" data-r>What They Say</div>
+  <div class="t-grid">
+    <div class="t-c" data-r><div class="t-q">"The results are extraordinary! The website far exceeded my expectations. Modern design, fast loading, responsive on all devices."</div><div class="t-sep"></div><div class="t-name">Ahmad Fauzi</div><div class="t-loc">Online Entrepreneur — Kendari</div></div>
+    <div class="t-c" data-r style="transition-delay:.1s"><div class="t-q">"Very satisfied with the ordered template. Ready to use immediately, the appearance is professional. Affordable price for this quality."</div><div class="t-sep"></div><div class="t-name">Siti Rahmawati</div><div class="t-loc">Culinary Business Owner — Makassar</div></div>
+    <div class="t-c" data-r style="transition-delay:.2s"><div class="t-q">"HE Store is the best! The premium Netflix subscription is super cheap and fast. 3 months in, never had any issues."</div><div class="t-sep"></div><div class="t-name">Rizky Pratama</div><div class="t-loc">Student — Bombana</div></div>
   </div>
 </section>
 
+<!-- CONTACT -->
 <section id="contact">
-  <div class="contact-grid">
-    <div class="rev-l">
-      <div class="sec-chip" data-key="chip_contact">CONTACT</div>
-      <h2 class="ct-title" data-key="contact_title">Let us<br><em>Collaborate</em></h2>
-      <p class="ct-p" data-key="contact_p1">Have a website project you want to bring to life? Need a professional template at an affordable price? Or want to subscribe to premium apps?</p>
-      <p class="ct-p" data-key="contact_p2">Do not hesitate to reach out via WhatsApp or email. I respond quickly and enjoy discussing anything related to your digital project.</p>
-      <div class="loc-box"><div class="loc-label" data-key="contact_loc_l">LOCATION</div><div class="loc-text" data-key="contact_loc">Mulaeno Village, Poleang Tengah District<br>Bombana Regency, Southeast Sulawesi 93773<br>Indonesia</div></div>
-    </div>
-    <div class="rev-r">
-      <div class="ct-channels">
-        <a href="https://wa.me/6281346807918" target="_blank" class="ct-ch"><div class="ch-ico">💬</div><div><div class="ch-lbl" data-key="ch1_l">WHATSAPP</div><div class="ch-val">+62 813-4680-7918</div></div></a>
-        <a href="mailto:zaenurroyhanh@gmail.com" class="ct-ch"><div class="ch-ico">✉️</div><div><div class="ch-lbl" data-key="ch2_l">EMAIL</div><div class="ch-val">zaenurroyhanh@gmail.com</div></div></a>
-        <a href="https://tiktok.com/@haneleff" target="_blank" class="ct-ch"><div class="ch-ico">🎵</div><div><div class="ch-lbl" data-key="ch3_l">TIKTOK</div><div class="ch-val">@haneleff</div></div></a>
+  <div class="sec-lbl" data-r>Contact</div>
+  <div class="con-wrap">
+    <div data-rl>
+      <h2 class="con-title">Let's<br><em>Collaborate</em></h2>
+      <p class="con-p">Have a website project idea? Need a professional template? Or want to subscribe to premium apps? I am ready to help.</p>
+      <p class="con-p">Don't hesitate to reach out via WhatsApp or email. I respond quickly and love discussing digital projects.</p>
+      <div class="chs">
+        <a href="https://wa.me/6281346807918" target="_blank" rel="noopener" class="ch" aria-label="WhatsApp: 081346807918"><span class="ch-lbl">WhatsApp</span><span class="ch-val">081346807918</span><span class="ch-arr">→</span></a>
+        <a href="mailto:zaenurroyhanh@gmail.com" class="ch" aria-label="Email: zaenurroyhanh@gmail.com"><span class="ch-lbl">Email</span><span class="ch-val">zaenurroyhanh@gmail.com</span><span class="ch-arr">→</span></a>
+        <a href="https://tiktok.com/@haneleff" target="_blank" rel="noopener" class="ch" aria-label="TikTok: @haneleff"><span class="ch-lbl">TikTok</span><span class="ch-val">@haneleff</span><span class="ch-arr">→</span></a>
       </div>
-      <img class="ct-map-img" src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=700&q=80" alt="" loading="lazy"/>
+    </div>
+    <div data-rr>
+      <div class="con-right-top">
+        <div class="con-loc-lbl">Location</div>
+        <div class="con-loc-val">Mulaeno Village, Poleang Tengah<br>Bombana Regency, Southeast Sulawesi 93773<br>Indonesia</div>
+      </div>
+      <div class="con-avail">
+        <div class="avail-row"><span class="avail-dot"></span><span class="avail-txt">Available for new projects</span></div>
+        <p class="avail-p">Open for website creation, template design, and digital service subscriptions. Response within 24 hours.</p>
+        <a href="https://wa.me/6281346807918" target="_blank" rel="noopener" class="btn-w magnetic">Start a Conversation →</a>
+      </div>
     </div>
   </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
-  <div class="foot-brand">HE<span>✦</span>PORTO</div>
-  <nav class="foot-nav">
-    <a href="#about"   data-key="nav_about">About</a>
-    <a href="#skills"  data-key="nav_skills">Skills</a>
-    <a href="#works"   data-key="nav_works">Works</a>
-    <a href="#hestore" data-key="nav_store">HE Store</a>
-    <a href="#contact" data-key="nav_contact">Contact</a>
-  </nav>
-  <div class="foot-copy" data-key="foot_copy">© 2025 Zaenur Royhan Helmi<br>zaenurroyhanh@gmail.com</div>
+  <div class="foot-c">© 2025 Zaenur Royhan Helmi — zaenurroyhanh@gmail.com</div>
+  <div class="foot-links">
+    <a href="https://wa.me/6281346807918" target="_blank" rel="noopener">WhatsApp</a>
+    <a href="mailto:zaenurroyhanh@gmail.com">Email</a>
+    <a href="https://tiktok.com/@haneleff" target="_blank" rel="noopener">TikTok</a>
+  </div>
 </footer>
 
 <script>
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   TRANSLATIONS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-var LANG={
-en:{
-  nav_about:'About',nav_skills:'Skills',nav_works:'Works',nav_store:'HE Store',nav_contact:'Contact',nav_cta:'Contact ↗',
-  hero_label:'✦ Portfolio & Company Information — 2025',
-  hero_sub:'Web Developer · Template Designer · Founder of HE Store — crafting elegant and meaningful digital experiences from Southeast Sulawesi.',
-btn_view:'View Works ↓',btn_contact:'Contact Me →',scroll_lbl:'SCROLL TO EXPLORE',
-  chip_about:'ABOUT ME',
-  about_intro:'A young developer with <em>great passion</em> for building beautiful, functional, and memorable web experiences.',
-  about_p1:'Zaenur Royhan Helmi was born and raised in Mulaeno Village, Bombana Regency, Southeast Sulawesi. From a young age, he has shown a strong interest in technology and digital design.',
-  about_p2:'With an educational background in a disciplined Islamic boarding school environment, Zaenur developed self-taught web programming skills — proving that geographical limitations are not barriers to world-class expertise.',
-  about_p3:'He is currently focused on building digital works through his personal brand, <strong style="color:var(--white)">HE Store</strong>, while continuously honing his frontend design and development skills.',
-  about_p4:'He believes that every website is not just a collection of code — but a <em style="color:var(--blue2)">story told visually</em>.',
-  about_quote:'"I do not just build websites — I build experiences that make people pause and say: this is different."',
-  td_name:'Full Name',td_born:'Date of Birth',td_born_val:'Monday, June 18, 2007',
-  td_address:'Address',td_address_val:'Mulaeno Village, Poleang Tengah,<br>Bombana Regency, Southeast Sulawesi',
-  td_wa:'WhatsApp',td_email:'Email',td_tiktok:'TikTok',
-  stat1:'COMPLETED PROJECTS',stat2:'ACTIVE SERVICES',stat3:'SINCE 2024',stat4:'LEARNING SPIRIT',
-  chip_skills:'CORE SKILLS',skills_h:'SKILL<br><em>Stack</em>',
-  skills_sub:'Specializing in modern frontend technologies to build stunning, responsive, and high-performance interfaces.',
-  sk1_d:'Semantic structure, responsive layouts, CSS animations, pixel-perfect styling.',
-  sk2_d:'DOM manipulation, event handling, fetch API, smooth UI logic.',
-  sk3_d:'Ready-to-use website templates with modern aesthetics and modular components.',
-  sk4_d:'Adaptive layouts from mobile 320px to ultrawide 2560px.',
-  sk5_d:'Micro-interactions, scroll-triggered animations, Three.js 3D visuals.',
-  sk6_d:'Visual hierarchy, whitespace, typography, color contrast, intuitive user flow.',
-  chip_works:'SELECTED WORKS',works_h:'FEATURED<br><em>Projects</em>',
-  works_note:'Five websites built with pure HTML, CSS, and JavaScript — lightweight, fast, backend-free.',
-  w1_desc:'Futuristic AI interface — interactive AI platform with a stunning design',
-  w2_desc:'Lightweight and intuitive personal daily financial notes app',
-  w3_desc:'Premium business profile with modern design and integrated order system',
-  w4_desc:'Structured and efficient HE Store operational records system',
-  w5_desc:'AP Store order management — integrated and real-time order tracking',
-  w_open:'OPEN WEBSITE ↗',
-  chip_extra:'INSPIRATION & VISION',
-  ex1_cat:'DESIGN VISION',ex1_title:'Building the Digital Future',ex1_sub:'Every project is a step toward innovation',
-  ex2_cat:'WORKSPACE',ex2_title:'Clean Code, Clear Mind',ex2_sub:'Productivity in simplicity',
-  ex3_cat:'COLLABORATION',ex3_title:'Big Ideas Start from Small Conversations',ex3_sub:'Let us bring your vision to life',
-  chip_edu:'EDUCATION HISTORY',
-  edu_p1:'A long journey from elementary school in the small village of Mulaeno to madrasah aliyah — a foundation that builds character, discipline, and an unquenchable curiosity.',
-  edu_p2:'The values instilled at Baitul Arqom pesantren — perseverance, honesty, and a love of learning — become the compass in every line of code written.',
-  edu_l1:'ELEMENTARY SCHOOL',edu_l2:'JUNIOR HIGH (ISLAMIC)',edu_l3:'SENIOR HIGH (ISLAMIC)',
-  edu_loc1:'Mulaeno Village, Poleang Tengah, Bombana Regency',
-  edu_loc2:'Polinggona, Kolaka Regency, Southeast Sulawesi',
-  edu_loc3:'Polinggona, Kolaka Regency, Southeast Sulawesi',
-  chip_process:'WORKFLOW',process_h:'CREATIVE<br><em>Process</em>',
-  process_sub:'From the first idea to the final file, every stage is executed carefully and results-oriented.',
-  step1_t:'DISCOVERY',step1_txt:'Listening to and understanding client needs, business goals, and design references in depth.',
-  step2_t:'CONCEPT',step2_txt:'Designing wireframes, selecting color palettes, typography, and visual concepts for brand identity.',
-  step3_t:'BUILD',step3_txt:'Coding with clean, responsive HTML, CSS, JavaScript optimized for the best performance.',
-  step4_t:'DELIVER',step4_txt:'Thorough testing across devices, revisions until perfect, delivery of deploy-ready files.',
-  chip_store:'HE STORE',store_h:'Affordable Digital <em>Solutions</em><br>for Everyone',
-  store_p1:'HE Store is a digital brand born from the belief that premium technology should be accessible to everyone — not just large corporations with big budgets.',
-  store_p2:'We provide professional website development services and premium app packages at very affordable prices, without compromising quality.',
-  store_p3:'Every client — from small entrepreneurs to local communities — receives the same attention and dedication. Client satisfaction is everything.',
-  store_btn1:'Order Now ↗',store_btn2:'View Profile →',
-  svc1_n:'WEBSITE DEVELOPMENT',svc1_t:'Professional website development using HTML, CSS, and JavaScript. Business profiles, portfolios, landing pages, and lightweight systems.',svc1_tag:'REQUEST PRICE',
-  svc2_n:'PREMIUM APPS',svc2_t:'Access to Netflix, Spotify, and other digital services at prices far below the official rate. Fast, secure, and trusted.',svc2_tag:'SPECIAL PRICE',
-  svc3_n:'DESIGN TEMPLATES',svc3_t:'Ready-to-use website templates with modern and professional design. Easy customization. Suitable for any business.',svc3_tag:'READY TO USE',
-  store_cta_h:'Ready to start a <em>project together?</em>',
-  store_cta_p:'Free consultation via WhatsApp. Tell me your needs and I will help bring it to life quickly.',
-  store_cta_btn:'Chat WhatsApp ↗',
-  chip_philo:'PHILOSOPHY',
-  philo_q:'"Every pixel must be <em>meaningful</em>. Every line of code must have <em>value</em>. Design is not decoration — it is <em>communication</em> that speaks without sound."',
-  philo_attr:'— Zaenur Royhan Helmi',
-  ph1_n:'SIMPLICITY FIRST',ph1_t:'Simplicity executed perfectly is always more powerful than unnecessary complexity. Clean, focused, purposeful design.',
-  ph2_n:'PURPOSE DRIVEN',ph2_t:'Every visual decision must have a reason. Aesthetics and function work together as one harmonious unit.',
-  ph3_n:'ALWAYS GROWING',ph3_t:'The tech world moves very fast. Committed to continuously learning, adapting, and pushing to the next level every day.',
-  chip_testi:'WHAT THEY SAY',
-  t1:'"The result is outstanding! The website far exceeded my expectations. Modern design, fast loading, responsive on all devices."',
-  t1_a:'Ahmad Fauzi',t1_l:'ONLINE ENTREPRENEUR — KENDARI',
-  t2:'"Very satisfied with the template ordered. Ready to use immediately, looks very professional. Affordable price for this quality."',
-  t2_a:'Siti Rahmawati',t2_l:'F&B BUSINESS OWNER — MAKASSAR',
-  t3:'"HE Store is the best! The premium Netflix subscription is super cheap and lightning fast. 3 months, no issues."',
-  t3_a:'Rizky Pratama',t3_l:'STUDENT — BOMBANA',
-  chip_contact:'CONTACT',contact_title:'Let us<br><em>Collaborate</em>',
-  contact_p1:'Have a website project? Need a professional template? Or want to subscribe to premium apps? I am here to help.',
-  contact_p2:'Do not hesitate to reach out via WhatsApp or email. I respond quickly and enjoy discussing your digital project.',
-  contact_loc_l:'LOCATION',contact_loc:'Mulaeno Village, Poleang Tengah District<br>Bombana Regency, Southeast Sulawesi 93773<br>Indonesia',
-  ch1_l:'WHATSAPP',ch2_l:'EMAIL',ch3_l:'TIKTOK',
-  foot_copy:'© 2025 Zaenur Royhan Helmi<br>zaenurroyhanh@gmail.com',
-  ctrl_theme:'THEME',ctrl_light:'LIGHT',ctrl_dark:'DARK',ctrl_lang:'LANGUAGE',
-  meta_loc:'LOCATION',meta_loc_val:'— BOMBANA, SULTRA',
-  meta_focus:'FOCUS',meta_focus_val:'— FRONTEND DEV',
-  meta_status:'STATUS',meta_status_val:'— AVAILABLE ●',
-  full1_label:'✦ PHILOSOPHY',full1_text:'DESIGN IS<br><em>thinking</em><br>MADE VISUAL',
-  full2_label:'✦ HE STORE — SOUTHEAST SULAWESI',full2_text:'FROM <em>Sulawesi</em><br>TO THE WORLD',
-  mq1:'WEB DEVELOPER',mq2:'HTML / CSS / JS',mq3:'TEMPLATE DESIGN',mq4:'HE STORE',mq5:'PREMIUM APPS',mq6:'SOUTHEAST SULAWESI'
-},
-id:{
-  nav_about:'Tentang',nav_skills:'Keahlian',nav_works:'Karya',nav_store:'HE Store',nav_contact:'Kontak',nav_cta:'Hubungi ↗',
-  hero_label:'✦ Portfolio & Company Information — 2025',
-  hero_sub:'Web Developer · Template Designer · Founder of HE Store — menciptakan pengalaman digital yang elegan dan bermakna dari Sulawesi Tenggara.',
-btn_view:'Lihat Karya ↓',btn_contact:'Hubungi Saya →',scroll_lbl:'SCROLL TO EXPLORE',
-  chip_about:'TENTANG SAYA',
-  about_intro:'Seorang developer muda dengan <em>passion yang besar</em> untuk membangun pengalaman web yang indah, fungsional, dan berkesan.',
-  about_p1:'Zaenur Royhan Helmi lahir dan besar di Desa Mulaeno, Kabupaten Bombana, Sulawesi Tenggara. Sejak usia muda, ia menunjukkan minat yang kuat terhadap teknologi dan desain digital.',
-  about_p2:'Dengan latar belakang pendidikan pesantren yang disiplin, Zaenur mengembangkan kemampuan self-taught pemrograman web — membuktikan bahwa keterbatasan geografis bukan hambatan untuk meraih keahlian kelas dunia.',
-  about_p3:'Saat ini ia fokus membangun karya digital melalui brand-nya, <strong style="color:var(--white)">HE Store</strong>, sambil terus mengasah kemampuan desain dan pengembangan frontend.',
-  about_p4:'Ia percaya bahwa setiap website bukan hanya kumpulan kode — melainkan <em style="color:var(--blue2)">cerita yang diceritakan secara visual</em>.',
-  about_quote:'"Saya tidak sekadar membangun website — saya membangun pengalaman yang membuat orang berhenti dan berkata: ini berbeda."',
-  td_name:'Nama Lengkap',td_born:'Tanggal Lahir',td_born_val:'Senin, 18 Juni 2007',
-  td_address:'Alamat',td_address_val:'Desa Mulaeno, Kec. Poleang Tengah,<br>Kab. Bombana, Sulawesi Tenggara',
-  td_wa:'WhatsApp',td_email:'Email',td_tiktok:'TikTok',
-  stat1:'PROYEK SELESAI',stat2:'LAYANAN AKTIF',stat3:'SEJAK 2024',stat4:'SEMANGAT BELAJAR',
-  chip_skills:'KEAHLIAN UTAMA',skills_h:'SKILL<br><em>Stack</em>',
-  skills_sub:'Spesialisasi pada teknologi frontend modern untuk membangun antarmuka yang memukau, responsif, dan berperforma tinggi.',
-  sk1_d:'Struktur semantik, layout responsif, animasi CSS, pixel-perfect styling.',
-  sk2_d:'DOM manipulation, event handling, fetch API, logika UI yang smooth.',
-  sk3_d:'Template website siap pakai dengan estetika modern dan komponen modular.',
-  sk4_d:'Layout adaptif dari mobile 320px hingga ultrawide 2560px.',
-  sk5_d:'Micro-interactions, scroll-triggered animations, visual 3D Three.js.',
-  sk6_d:'Hierarki visual, whitespace, tipografi, kontras warna, user flow intuitif.',
-  chip_works:'KARYA TERPILIH',works_h:'PROYEK<br><em>Unggulan</em>',
-  works_note:'Lima website dengan HTML, CSS, dan JavaScript murni — ringan, cepat, tanpa backend.',
-  w1_desc:'Antarmuka AI futuristik — platform AI interaktif dengan desain yang memukau',
-  w2_desc:'Aplikasi pencatatan keuangan harian personal yang ringan dan intuitif',
-  w3_desc:'Profil bisnis premium dengan desain modern dan sistem order terintegrasi',
-  w4_desc:'Sistem pencatatan operasional HE Store yang terstruktur dan efisien',
-  w5_desc:'Manajemen pesanan AP Store — pencatatan order terintegrasi dan real-time',
-  w_open:'BUKA WEBSITE ↗',
-  chip_extra:'INSPIRASI & VISI',
-  ex1_cat:'VISI DESAIN',ex1_title:'Membangun Masa Depan Digital',ex1_sub:'Setiap proyek adalah langkah menuju inovasi',
-  ex2_cat:'WORKSPACE',ex2_title:'Kode Bersih, Pikiran Jernih',ex2_sub:'Produktivitas dalam kesederhanaan',
-  ex3_cat:'KOLABORASI',ex3_title:'Ide Besar Dimulai dari Percakapan Kecil',ex3_sub:'Mari wujudkan visi Anda bersama',
-  chip_edu:'RIWAYAT PENDIDIKAN',
-  edu_p1:'Perjalanan panjang dari SD di desa kecil Mulaeno hingga madrasah aliyah — fondasi yang membangun karakter, disiplin, dan rasa ingin tahu yang tak pernah padam.',
-  edu_p2:'Nilai-nilai dari pesantren Baitul Arqom — ketekunan, kejujuran, dan semangat belajar — menjadi kompas dalam setiap baris kode yang ditulis.',
-  edu_l1:'SEKOLAH DASAR',edu_l2:'MADRASAH TSANAWIYAH',edu_l3:'MADRASAH ALIYAH',
-  edu_loc1:'Desa Mulaeno, Kec. Poleang Tengah, Kab. Bombana',
-  edu_loc2:'Polinggona, Kab. Kolaka, Sulawesi Tenggara',
-  edu_loc3:'Polinggona, Kab. Kolaka, Sulawesi Tenggara',
-  chip_process:'CARA KERJA',process_h:'PROSES<br><em>Kreatif</em>',
-  process_sub:'Dari idea pertama hingga file final, setiap tahap dijalankan dengan teliti dan berorientasi pada hasil terbaik.',
-  step1_t:'DISCOVERY',step1_txt:'Mendengarkan dan memahami kebutuhan klien, tujuan bisnis, dan referensi desain secara mendalam.',
-  step2_t:'CONCEPT',step2_txt:'Merancang wireframe, memilih palet warna, tipografi, dan konsep visual selaras dengan brand.',
-  step3_t:'BUILD',step3_txt:'Mengkode dengan HTML, CSS, JavaScript yang bersih, responsif, dan dioptimalkan untuk performa terbaik.',
-  step4_t:'DELIVER',step4_txt:'Testing menyeluruh di berbagai device, revisi hingga sempurna, delivery file siap deploy.',
-  chip_store:'HE STORE',store_h:'Solusi Digital <em>Terjangkau</em><br>untuk Semua',
-  store_p1:'HE Store adalah brand digital yang lahir dari keyakinan bahwa teknologi premium seharusnya bisa dinikmati semua kalangan.',
-  store_p2:'Kami menghadirkan jasa pembuatan website profesional dan paket aplikasi premium dengan harga sangat terjangkau, tanpa mengorbankan kualitas.',
-  store_p3:'Setiap klien — dari pengusaha kecil hingga komunitas lokal — mendapatkan perhatian dan dedikasi yang sama. Kepuasan klien adalah segalanya.',
-  store_btn1:'Pesan Sekarang ↗',store_btn2:'Lihat Profil →',
-  svc1_n:'PEMBUATAN WEBSITE',svc1_t:'Jasa pembuatan website profesional menggunakan HTML, CSS, dan JavaScript. Profil bisnis, portofolio, landing page, dan sistem catatan ringan.',svc1_tag:'REQUEST HARGA',
-  svc2_n:'APLIKASI PREMIUM',svc2_t:'Akses Netflix, Spotify, dan layanan digital lainnya dengan harga jauh di bawah harga resmi. Proses cepat, aman, dan terpercaya.',svc2_tag:'HARGA SPESIAL',
-  svc3_n:'TEMPLATE DESAIN',svc3_t:'Template website siap pakai dengan desain modern dan profesional. Kustomisasi mudah. Cocok untuk bisnis apapun.',svc3_tag:'SIAP PAKAI',
-  store_cta_h:'Siap mulai proyek <em>bersama?</em>',
-  store_cta_p:'Konsultasi gratis via WhatsApp. Ceritakan kebutuhanmu dan aku siap membantu mewujudkannya.',
-  store_cta_btn:'Chat WhatsApp ↗',
-  chip_philo:'FILOSOFI',
-  philo_q:'"Setiap piksel harus <em>bermakna</em>. Setiap baris kode harus <em>bernilai</em>. Desain bukan dekorasi — ia adalah <em>komunikasi</em> yang berbicara tanpa suara."',
-  philo_attr:'— Zaenur Royhan Helmi',
-  ph1_n:'SIMPLICITY FIRST',ph1_t:'Kesederhanaan yang dieksekusi sempurna selalu lebih kuat dari kompleksitas berlebihan. Desain bersih, terarah, purposeful.',
-  ph2_n:'PURPOSE DRIVEN',ph2_t:'Setiap keputusan visual harus memiliki alasan. Estetika dan fungsi bekerja bersama sebagai satu kesatuan yang harmonis.',
-  ph3_n:'ALWAYS GROWING',ph3_t:'Dunia teknologi bergerak sangat cepat. Komitmen untuk terus belajar, beradaptasi, dan mendorong diri ke level berikutnya.',
-  chip_testi:'APA KATA MEREKA',
-  t1:'"Hasilnya luar biasa! Website jauh melampaui ekspektasi saya. Desainnya modern, loadingnya cepat, responsif di semua device."',
-  t1_a:'Ahmad Fauzi',t1_l:'PENGUSAHA ONLINE — KENDARI',
-  t2:'"Sangat puas dengan template yang dipesan. Langsung bisa dipakai, tampilannya profesional. Harganya terjangkau untuk kualitas ini."',
-  t2_a:'Siti Rahmawati',t2_l:'OWNER BISNIS KULINER — MAKASSAR',
-  t3:'"HE Store is the best! Langganan Netflix premiumnya murah banget dan super cepat. Sudah 3 bulan, tidak pernah ada masalah."',
-  t3_a:'Rizky Pratama',t3_l:'MAHASISWA — BOMBANA',
-  chip_contact:'KONTAK',contact_title:'Mari<br><em>Berkolaborasi</em>',
-  contact_p1:'Punya ide proyek website? Butuh template profesional? Atau ingin berlangganan aplikasi premium? Saya siap membantu.',
-  contact_p2:'Jangan ragu menghubungi via WhatsApp atau email. Saya merespons cepat dan senang berdiskusi tentang proyek digitalmu.',
-  contact_loc_l:'LOKASI',contact_loc:'Desa Mulaeno, Kec. Poleang Tengah<br>Kab. Bombana, Sulawesi Tenggara 93773<br>Indonesia',
-  ch1_l:'WHATSAPP',ch2_l:'EMAIL',ch3_l:'TIKTOK',
-  foot_copy:'© 2025 Zaenur Royhan Helmi<br>zaenurroyhanh@gmail.com',
-  ctrl_theme:'TEMA',ctrl_light:'TERANG',ctrl_dark:'GELAP',ctrl_lang:'BAHASA',
-  meta_loc:'LOKASI',meta_loc_val:'— BOMBANA, SULTRA',
-  meta_focus:'FOKUS',meta_focus_val:'— FRONTEND DEV',
-  meta_status:'STATUS',meta_status_val:'— TERSEDIA ●',
-  full1_label:'✦ FILOSOFI',full1_text:'DESAIN ADALAH<br><em>pemikiran</em><br>YANG DIVISUALISASIKAN',
-  full2_label:'✦ HE STORE — SULAWESI TENGGARA',full2_text:'FROM <em>Sulawesi</em><br>TO THE WORLD',
-  mq1:'WEB DEVELOPER',mq2:'HTML / CSS / JS',mq3:'TEMPLATE DESIGN',mq4:'HE STORE',mq5:'APLIKASI PREMIUM',mq6:'SULAWESI TENGGARA'
-}};
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   THEME  (global)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function setTheme(t){
-  document.body.classList.toggle('light', t==='light');
-  document.getElementById('btn-light').classList.toggle('active', t==='light');
-  document.getElementById('btn-dark').classList.toggle('active',  t==='dark');
-  localStorage.setItem('he-theme', t);
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   LANGUAGE  (global, data-key driven)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-function setLang(lang){
-  var T=LANG[lang];
-  document.getElementById('btn-en').classList.toggle('active', lang==='en');
-  document.getElementById('btn-id').classList.toggle('active', lang==='id');
-  document.getElementById('lbl-theme').textContent=T.ctrl_theme;
-  document.getElementById('lbl-lang').textContent=T.ctrl_lang;
-  document.getElementById('btn-light').textContent=T.ctrl_light;
-  document.getElementById('btn-dark').textContent=T.ctrl_dark;
-  document.querySelectorAll('[data-key]').forEach(function(el){
-    var v=T[el.dataset.key];
-    if(v!==undefined) el.innerHTML=v;
-  });
-  document.querySelectorAll('[data-mq]').forEach(function(el){
-    var v=T[el.dataset.mq];
-    if(v!==undefined) el.innerHTML=v+'&nbsp;&nbsp;<b>·</b>&nbsp;&nbsp;';
-  });
-  document.getElementById('meta-loc').innerHTML=T.meta_loc+' <span>'+T.meta_loc_val+'</span>';
-  document.getElementById('meta-focus').innerHTML=T.meta_focus+' <span>'+T.meta_focus_val+'</span>';
-  document.getElementById('meta-status').innerHTML=T.meta_status+' <span>'+T.meta_status_val+'</span>';
-  document.getElementById('full1-label').textContent=T.full1_label;
-  document.getElementById('full1-text').innerHTML=T.full1_text;
-  document.getElementById('full2-label').textContent=T.full2_label;
-  document.getElementById('full2-text').innerHTML=T.full2_text;
-  localStorage.setItem('he-lang',lang);
-}
-
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   LOADER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ── LOADER ── */
 (function(){
-  var p=0,fill=document.getElementById('ld-fill'),
-      pct=document.getElementById('ld-pct'),ldr=document.getElementById('loader');
+  var p=0,f=document.getElementById('ldf'),n=document.getElementById('ldn'),l=document.getElementById('loader');
   var iv=setInterval(function(){
-    p+=Math.random()*14;
-    if(p>=100){p=100;clearInterval(iv);setTimeout(function(){ldr.classList.add('gone');},500);}
-    fill.style.width=p+'%';
-    pct.textContent=String(Math.floor(p)).padStart(3,'0');
-  },70);
+    p+=Math.random()*11+1;
+    if(p>=100){p=100;clearInterval(iv);setTimeout(function(){l.classList.add('gone');},600);}
+    f.style.right=(100-p)+'%';
+    n.textContent=String(Math.floor(p)).padStart(3,'0');
+  },55);
 })();
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   CURSOR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-var cur=document.getElementById('cur'),ring=document.getElementById('cur-ring'),
-    mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',function(e){
-  mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';
-});
-(function lr(){
-  rx+=(mx-rx)*.1;ry+=(my-ry)*.1;
-  ring.style.left=rx+'px';ring.style.top=ry+'px';
-  requestAnimationFrame(lr);
-})();
-document.querySelectorAll('a,button,.sk-row,.svc-c,.w-item,.testi-c,.step-c,.philo-c').forEach(function(el){
-  el.addEventListener('mouseenter',function(){document.body.classList.add('hover-cur');});
-  el.addEventListener('mouseleave',function(){document.body.classList.remove('hover-cur');});
+/* ── CURSOR ── */
+var cur=document.getElementById('cur'),dot=document.getElementById('cur-dot');
+var mx=0,my=0,cx=0,cy=0;
+document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';},{passive:true});
+(function loop(){cx+=(mx-cx)*.1;cy+=(my-cy)*.1;cur.style.left=cx+'px';cur.style.top=cy+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.sk-row,.svc-c,.step-c,.ph-c,.t-c,.w-item,.ch').forEach(function(el){
+  el.addEventListener('mouseenter',function(){cur.classList.add('hov');});
+  el.addEventListener('mouseleave',function(){cur.classList.remove('hov');});
 });
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   SCROLL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-var prog=document.getElementById('prog'),cv3d=document.getElementById('canvas3d'),navEl=document.getElementById('nav');
-window.addEventListener('scroll',function(){
-  var sy=window.scrollY;
-  prog.style.width=(sy/(document.body.scrollHeight-innerHeight)*100)+'%';
-  cv3d.style.opacity=Math.max(0,1-sy/(innerHeight*.6))*.55;
-  navEl.classList.toggle('scrolled',sy>80);
-  document.querySelectorAll('.full-section img').forEach(function(img){
-    var r=img.parentElement.getBoundingClientRect();
-    img.style.transform='translateY('+(r.top/innerHeight*28)+'px)';
+/* ── SCATTERED NAME (Anton & Irene) ── */
+(function(){
+  var container=document.getElementById('scattered-name');
+  var text='ZAENUR  ROYHAN  HELMI';
+  var letters=[];
+  var w=window.innerWidth;
+  var fontSize=w<=480?Math.min(w*0.125,68):w<=768?Math.min(w*0.105,96):Math.min(w*0.098,148);
+  var charW=fontSize*0.61;
+  var lineH=fontSize*1.08;
+  var lines=[['Z','A','E','N','U','R'],['R','O','Y','H','A','N'],['H','E','L','M','I']];
+  container.style.cssText='position:relative;width:100%;height:'+(lines.length*lineH+20)+'px';
+  var allSpans=[];
+  lines.forEach(function(line,li){
+    line.forEach(function(ch,ci){
+      var span=document.createElement('span');
+      span.textContent=ch;
+      span.style.cssText='position:absolute;font-family:var(--font-d);font-size:'+fontSize+'px;font-weight:300;line-height:1;color:#fff;will-change:transform,opacity;letter-spacing:-.02em;opacity:0;';
+      span.style.top=(li*lineH)+'px';
+      span.style.left=(ci*charW)+'px';
+      container.appendChild(span);
+      allSpans.push(span);
+    });
+  });
+  // scatter
+  allSpans.forEach(function(s){
+    var rx=(Math.random()-.5)*w*1.5;
+    var ry=(Math.random()-.5)*window.innerHeight*1.3;
+    var rot=(Math.random()-.5)*720;
+    s.style.transform='translate('+rx+'px,'+ry+'px) rotate('+rot+'deg) scale(.15)';
+  });
+  // assemble after loader
+  setTimeout(function(){
+    allSpans.forEach(function(s,i){
+      s.style.transition='transform '+(0.65+i*0.022)+'s cubic-bezier(.34,1.4,.64,1) '+(0.04+i*0.038)+'s, opacity .28s ease '+(0.04+i*0.038)+'s';
+      requestAnimationFrame(function(){
+        s.style.transform='translate(0,0) rotate(0deg) scale(1)';
+        s.style.opacity='1';
+      });
+    });
+  },820);
+})();
+
+/* ── PARALLAX LAYERS ── */
+(function(){
+  var layers=document.querySelectorAll('.p-layer[data-speed]');
+  var ticking=false;
+  window.addEventListener('scroll',function(){
+    if(!ticking){
+      requestAnimationFrame(function(){
+        var y=window.scrollY;
+        layers.forEach(function(l){l.style.transform='translateY('+(y*parseFloat(l.dataset.speed))+'px)';});
+        ticking=false;
+      });
+      ticking=true;
+    }
+  },{passive:true});
+})();
+
+/* ── VERTICAL PROGRESS + CHAPTER DOTS ── */
+var pfill=document.getElementById('prog-fill'),ppct=document.getElementById('prog-pct');
+var sections=['hero','about','skills','works','education','hestore','contact'];
+var dots=document.querySelectorAll('.ch-dot');
+dots.forEach(function(d){
+  d.addEventListener('click',function(){
+    var el=document.getElementById(d.dataset.target);
+    if(el)el.scrollIntoView({behavior:'smooth'});
   });
 });
+window.addEventListener('scroll',function(){
+  var sy=window.scrollY,sh=document.body.scrollHeight-innerHeight;
+  var pct=sh>0?sy/sh:0;
+  pfill.style.height=(pct*100)+'%';
+  pfill.parentElement.style.setProperty('--ph',(pct*(innerHeight))+'px');
+  ppct.textContent=Math.round(pct*100)+'%';
+  // active dot
+  var active=0;
+  sections.forEach(function(id,i){
+    var el=document.getElementById(id);
+    if(el&&el.getBoundingClientRect().top<=innerHeight*0.5)active=i;
+  });
+  dots.forEach(function(d,i){d.classList.toggle('active',i===active);});
+  document.getElementById('nav').classList.toggle('s',sy>80);
+},{passive:true});
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   REVEAL
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ── REVEAL ── */
 var obs=new IntersectionObserver(function(entries){
   entries.forEach(function(en,i){
-    if(en.isIntersecting) setTimeout(function(){en.target.classList.add('on');},i*50);
+    if(en.isIntersecting)setTimeout(function(){en.target.classList.add('on');},i*60);
   });
 },{threshold:.07});
-document.querySelectorAll('.rev,.rev-l,.rev-r').forEach(function(el){obs.observe(el);});
+document.querySelectorAll('[data-r],[data-rl],[data-rr]').forEach(function(el){obs.observe(el);});
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   THREE.JS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+/* ── WORKS FLOATING PREVIEW ── */
 (function(){
-  var canvas=document.getElementById('canvas3d');
-  var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-  renderer.setSize(innerWidth,innerHeight);
-  var scene=new THREE.Scene();
-  var cam=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,100);
-  cam.position.z=6;
-  scene.add(new THREE.AmbientLight(0xffffff,.15));
-  var l1=new THREE.PointLight(0x2997ff,4,25);l1.position.set(4,3,3);scene.add(l1);
-  var l2=new THREE.PointLight(0x0071e3,2,20);l2.position.set(-4,-2,2);scene.add(l2);
-  var ico=new THREE.Mesh(new THREE.IcosahedronGeometry(1.5,1),new THREE.MeshStandardMaterial({color:0x1d1d1f,metalness:.98,roughness:.04}));
-  ico.position.set(3,0,0);scene.add(ico);
-  var wf=new THREE.Mesh(new THREE.IcosahedronGeometry(1.52,1),new THREE.MeshBasicMaterial({color:0x2997ff,wireframe:true,transparent:true,opacity:.06}));
-  wf.position.copy(ico.position);scene.add(wf);
-  var rings=[];
-  [[2.4,.2,0x2997ff],[3.0,.005,0x0071e3]].forEach(function(a){
-    var m=new THREE.Mesh(new THREE.TorusGeometry(a[0],a[1],8,120),new THREE.MeshBasicMaterial({color:a[2],transparent:true,opacity:.18}));
-    m.position.copy(ico.position);m.rotation.x=1.1;scene.add(m);rings.push(m);
-  });
-  var N=500,pos=new Float32Array(N*3);
-  for(var i=0;i<N*3;i++) pos[i]=(Math.random()-.5)*22;
-  var pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
-  var pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0x2997ff,size:.02,transparent:true,opacity:.4}));
-  scene.add(pts);
-  var orbs=[];
-  [[-3.5,2,-2,.14],[-2,-2.5,-1,.09],[5,1,-1.5,.18],[1,3,-2,.11],[4.5,-1.5,0,.08]].forEach(function(a){
-    var m=new THREE.Mesh(new THREE.SphereGeometry(a[3],24,24),new THREE.MeshStandardMaterial({color:0x2997ff,metalness:.9,roughness:.1,emissive:0x2997ff,emissiveIntensity:.5}));
-    m.position.set(a[0],a[1],a[2]);m.userData={oy:a[1],ph:Math.random()*6.28,sp:.5+Math.random()};
-    scene.add(m);orbs.push(m);
-  });
-  var mox=0,moy=0;
-  document.addEventListener('mousemove',function(e){mox=(e.clientX/innerWidth-.5)*2;moy=(e.clientY/innerHeight-.5)*2;});
-  window.addEventListener('resize',function(){cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-  var clk=new THREE.Clock();
-  (function loop(){
-    requestAnimationFrame(loop);
-    var t=clk.getElapsedTime();
-    ico.rotation.x=t*.12;ico.rotation.y=t*.17;wf.rotation.copy(ico.rotation);
-    rings.forEach(function(r,i){r.rotation.z=t*(i?0.05:0.08);r.rotation.y=t*.03;});
-    l1.position.x=Math.sin(t*.5)*5;l1.position.y=Math.cos(t*.4)*3;
-    pts.rotation.y=t*.012;pts.rotation.x=t*.007;
-    orbs.forEach(function(o){o.position.y=o.userData.oy+Math.sin(t*o.userData.sp+o.userData.ph)*.4;});
-    cam.position.x+=(mox*.22-cam.position.x)*.05;
-    cam.position.y+=(-moy*.15-cam.position.y)*.05;
-    cam.lookAt(0,0,0);
-    renderer.render(scene,cam);
+  var preview=document.getElementById('wpreview');
+  var img=document.getElementById('wpreview-img');
+  var mx=0,my=0,px=0,py=0,vis=false;
+  document.addEventListener('mousemove',function(e){mx=e.clientX;my=e.clientY;},{passive:true});
+  (function anim(){
+    if(vis){px+=(mx-px)*.1;py+=(my-py)*.1;preview.style.left=(px+36)+'px';preview.style.top=(py-100)+'px';}
+    requestAnimationFrame(anim);
   })();
+  document.querySelectorAll('.w-item').forEach(function(item){
+    item.addEventListener('mouseenter',function(){
+      img.src=item.dataset.preview||'';px=mx;py=my;
+      preview.classList.add('vis');vis=true;
+    });
+    item.addEventListener('mouseleave',function(){preview.classList.remove('vis');vis=false;});
+  });
 })();
 
-/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   INIT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-setTheme(localStorage.getItem('he-theme')||'dark');
-setLang(localStorage.getItem('he-lang')||'en');
+/* ── MAGNETIC BUTTONS ── */
+document.querySelectorAll('.magnetic').forEach(function(btn){
+  btn.addEventListener('mousemove',function(e){
+    var r=btn.getBoundingClientRect();
+    var x=e.clientX-r.left-r.width/2;
+    var y=e.clientY-r.top-r.height/2;
+    btn.style.transform='translate('+(x*.28)+'px,'+(y*.28)+'px)';
+  });
+  btn.addEventListener('mouseleave',function(){
+    btn.style.transition='transform .5s cubic-bezier(.23,1,.32,1)';
+    btn.style.transform='';
+  });
+  btn.addEventListener('mouseenter',function(){btn.style.transition='none';});
+});
+
+/* ── MENU ── */
+var menuEl=document.getElementById('menu'),mbtn=document.getElementById('mbtn');
+mbtn.addEventListener('click',function(){menuEl.classList.add('open');document.body.style.overflow='hidden';mbtn.setAttribute('aria-expanded','true');});
+document.getElementById('mclose').addEventListener('click',mClose);
+function mClose(){menuEl.classList.remove('open');document.body.style.overflow='';mbtn.setAttribute('aria-expanded','false');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')mClose();});
 </script>
 </body>
 </html>
